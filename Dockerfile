@@ -21,5 +21,6 @@ USER stockyard
 COPY --from=api /app/target/stockyard-api-*.jar app.jar
 ENV SERVER_PORT=8080
 EXPOSE 8080
-# Honors the PORT variable that hosts like Render inject.
-ENTRYPOINT ["sh", "-c", "exec java -Dserver.port=${PORT:-8080} -jar app.jar"]
+# Honors the PORT variable that hosts like Render inject. The memory flags keep the JVM
+# inside small (512 MB) free-tier containers.
+ENTRYPOINT ["sh", "-c", "exec java -XX:MaxRAMPercentage=60 -XX:+UseSerialGC -Dserver.port=${PORT:-8080} -jar app.jar"]
