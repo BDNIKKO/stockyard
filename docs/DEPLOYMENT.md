@@ -32,14 +32,14 @@ Everything the app needs is wired up by the blueprint: the database connection c
 
 ## After deploying
 
-- Put the live address in the README where it says **LIVE URL**, in the presentation's demo slide notes, and in your project submission.
+- Put the live address in the README's **Live demo** section, in the presentation's demo slide notes, and in your project submission. (This project's live copy is https://stockyard-ucr9.onrender.com.)
 - Commit and push the change. Render redeploys automatically on every push to `main`.
 
 ## What to expect on the free tier
 
 | Behavior | Why it happens | What to do |
 |---|---|---|
-| First page load takes about 30 seconds | The service sleeps after about 15 minutes without traffic | Open the site a minute before a demo |
+| First page load can take up to a minute | The service sleeps after about 15 minutes without traffic | Open the site a minute before a demo |
 | Database is deleted after 30 days | Free Render databases expire | Upgrade the database plan, or redeploy and re-register |
 | Uploaded product photos disappear after a redeploy | Images are stored on the container's disk | Re-upload them, or move image storage to object storage (see the roadmap) |
 | Build is slow on the first deploy | Compiling both apps from scratch | Later builds reuse cached layers |
@@ -49,7 +49,7 @@ Everything the app needs is wired up by the blueprint: the database connection c
 - **Build fails at the database step:** you probably already have a free database. See "Before you start".
 - **Service restarts or shows "Out of memory":** the free plan has 512 MB. The image already limits the JVM heap to 60% of available memory; if it still restarts, move the web service to the Starter plan.
 - **Site loads but login fails with a server error:** open **Logs** and look for a database connection error. Confirm the `stockyard-db` database shows as **Available** and that the web service lists the `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD` environment variables.
-- **You see the Render "service waking up" page:** wait about 30 seconds and refresh.
+- **You see the Render "service waking up" page:** wait up to a minute and refresh.
 
 ## Configuration reference
 
