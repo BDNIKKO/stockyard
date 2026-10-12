@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: stockyard
+      POSTGRES_USER: stockyard
+      POSTGRES_PASSWORD: stockyard
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stockyard"]
+      interval: 5s
+      retries: 10
+
+  # `docker compose up --build` -> whole app at http://localhost:8080
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-local-compose-secret}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  pgdata:
+  uploads:

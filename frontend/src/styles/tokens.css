@@ -1,0 +1,49 @@
+/* Design tokens: spacing grid (4px), color system, type scale, elevation.
+   Breakpoints used across CSS Modules: 480px, 768px, 1024px.
+   Palette: warm cream base, dusty earth-pink, sage green, terracotta orange, calm blue for links. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --color-bg: #f5ebe5;
+  --color-surface: #fffdfb;
+  --color-border: #e6d6cd;
+  --color-text: #2e2a2c;
+  --color-muted: #7b6f6c;
+
+  --color-primary: #3b6a94;        /* calm blue: links, focus */
+  --color-primary-hover: #2e5578;
+  --color-primary-soft: #e8f0f7;
+
+  --color-sage: #5c7a66;           /* brand green: header, primary actions */
+  --color-sage-dark: #476552;
+  --color-sage-deep: #34503f;
+  --color-sage-soft: #e6eee7;
+  --color-pink: #d9a3a0;
+  --color-pink-soft: #f0d7d2;
+  --color-orange: #d98a4e;         /* brand accent */
+  --color-orange-light: #f2b077;
+  --color-orange-soft: #fbead9;
+
+  --color-danger: #b0463f;
+  --color-danger-soft: #f8e4e1;
+  --color-success: #4d7a5a;
+  --color-warning-bg: var(--color-orange-soft);
+
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'DM Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(94, 60, 50, 0.06), 0 4px 12px rgba(94, 60, 50, 0.06);
+  --shadow-hover: 0 2px 4px rgba(94, 60, 50, 0.08), 0 10px 24px rgba(94, 60, 50, 0.12);
+  --shadow-lg: 0 4px 8px rgba(40, 55, 45, 0.1), 0 24px 56px rgba(40, 55, 45, 0.22);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

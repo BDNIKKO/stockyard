@@ -1,0 +1,26 @@
+# Render Blueprint: New > Blueprint > pick this repo. One web service + one Postgres.
+services:
+  - type: web
+    name: stockyard
+    runtime: docker
+    plan: free
+    healthCheckPath: /v3/api-docs
+    envVars:
+      - key: DB_HOST
+        fromDatabase: { name: stockyard-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: stockyard-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: stockyard-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: stockyard-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: stockyard-db, property: password }
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: stockyard-db
+    plan: free
+    databaseName: stockyard
+    user: stockyard

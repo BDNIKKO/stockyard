@@ -1,0 +1,55 @@
+.shell { min-height: 100vh; }
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'brand logout' 'nav nav';
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+  border-bottom: 3px solid var(--color-orange);
+  box-shadow: 0 4px 16px rgba(52, 80, 63, 0.25);
+}
+.brand { grid-area: brand; }
+.shopName { font-size: var(--text-sm); opacity: 0.8; margin-left: var(--space-2); }
+.nav { grid-area: nav; display: flex; gap: var(--space-1); overflow-x: auto; }
+.link {
+  color: #fff;
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 999px;
+  opacity: 0.88;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.link:hover { background: rgba(255, 255, 255, 0.16); opacity: 1; }
+.active { background: var(--color-pink); color: #3a2423; opacity: 1; font-weight: 600; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+.active:hover { background: var(--color-pink); }
+.logout {
+  grid-area: logout;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  border-radius: 999px;
+  padding: var(--space-1) var(--space-4);
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+.logout:hover { background: rgba(255, 255, 255, 0.16); }
+
+.main { max-width: 1100px; margin: 0 auto; padding: var(--space-4); animation: rise 0.4s var(--ease) both; }
+
+@media (min-width: 768px) {
+  .header {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'brand nav logout';
+    padding: var(--space-3) var(--space-8);
+    gap: var(--space-8);
+  }
+  .main { padding: var(--space-8); }
+}
