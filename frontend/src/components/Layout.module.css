@@ -1,4 +1,20 @@
-.shell { min-height: 100vh; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(60px, -40px) scale(1.15); }
+}
+
+.shell { min-height: 100vh; position: relative; display: flex; flex-direction: column; }
+
+/* Ambient light behind the content: slow, soft, never distracting. */
+.ambient { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.ambient i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: drift 22s ease-in-out infinite alternate; }
+.ambient i:nth-child(1) { width: 560px; height: 560px; left: -160px; top: 120px; background: rgba(110, 150, 122, 0.3); }
+.ambient i:nth-child(2) { width: 520px; height: 520px; right: -120px; top: -80px; background: rgba(228, 158, 156, 0.45); animation-duration: 28s; animation-direction: alternate-reverse; }
+.ambient i:nth-child(3) { width: 440px; height: 440px; right: 10%; bottom: -160px; background: rgba(245, 176, 120, 0.32); animation-duration: 32s; }
 
 .header {
   position: sticky;
@@ -11,12 +27,20 @@
   gap: var(--space-2) var(--space-4);
   padding: var(--space-3) var(--space-4);
   color: #fff;
-  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+  background: linear-gradient(135deg, rgba(92, 122, 102, 0.96) 0%, rgba(71, 101, 82, 0.96) 100%);
   border-bottom: 3px solid var(--color-orange);
   box-shadow: 0 4px 16px rgba(52, 80, 63, 0.25);
+  transition: padding 0.35s var(--ease), box-shadow 0.35s var(--ease), background 0.35s var(--ease);
 }
-.brand { grid-area: brand; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.shopName { font-size: var(--text-sm); opacity: 0.8; margin-left: var(--space-2); }
+.scrolled {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+  background: linear-gradient(135deg, rgba(92, 122, 102, 0.82) 0%, rgba(71, 101, 82, 0.82) 100%);
+  backdrop-filter: blur(16px) saturate(1.5);
+  box-shadow: 0 10px 34px rgba(52, 80, 63, 0.32);
+}
+.brand { grid-area: brand; min-width: 0; display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+.shopName { font-size: var(--text-sm); opacity: 0.8; margin-left: var(--space-3); padding-left: var(--space-3); border-left: 1px solid rgba(255, 255, 255, 0.3); overflow: hidden; text-overflow: ellipsis; }
 .nav { grid-area: nav; display: flex; gap: var(--space-1); overflow-x: auto; }
 .link {
   color: #fff;
@@ -25,10 +49,10 @@
   border-radius: 999px;
   opacity: 0.88;
   white-space: nowrap;
-  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease), opacity 0.2s;
 }
-.link:hover { background: rgba(255, 255, 255, 0.16); opacity: 1; }
-.active { background: var(--color-pink); color: #3a2423; opacity: 1; font-weight: 600; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+.link:hover { background: rgba(255, 255, 255, 0.16); opacity: 1; transform: translateY(-1px); }
+.active { background: var(--color-pink); color: #3a2423; opacity: 1; font-weight: 600; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18); }
 .active:hover { background: var(--color-pink); }
 .logout {
   grid-area: logout;
@@ -42,7 +66,24 @@
 }
 .logout:hover { background: rgba(255, 255, 255, 0.16); }
 
-.main { max-width: 1100px; margin: 0 auto; padding: var(--space-4); animation: rise 0.4s var(--ease) both; }
+.main { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: var(--space-4); position: relative; z-index: 1; }
+.main > * { animation: rise 0.6s var(--ease) both; }
+.main > *:nth-child(2) { animation-delay: 0.07s; }
+.main > *:nth-child(3) { animation-delay: 0.14s; }
+.main > *:nth-child(4) { animation-delay: 0.21s; }
+.main > *:nth-child(n + 5) { animation-delay: 0.28s; }
+
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
 
 @media (min-width: 768px) {
   .header {
@@ -51,5 +92,10 @@
     padding: var(--space-3) var(--space-8);
     gap: var(--space-8);
   }
+  .scrolled { padding-top: var(--space-2); padding-bottom: var(--space-2); }
   .main { padding: var(--space-8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient i, .main > * { animation: none; }
 }

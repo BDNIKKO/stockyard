@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import api, { describeError } from '../api.js';
+import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { formatMoney } from '../format.js';
 import ui from '../styles/ui.module.css';
 import styles from './Dashboard.module.css';
@@ -14,7 +15,7 @@ export default function Dashboard() {
   }, []);
 
   if (error) return <div className={ui.error}>{error}</div>;
-  if (!data) return <p>Loading…</p>;
+  if (!data) return <DashboardSkeleton />;
 
   const chartData = data.channels.map((c) => ({
     name: c.channelName,
@@ -27,14 +28,20 @@ export default function Dashboard() {
       <div className={ui.pageHeader}><h1>Dashboard</h1><span className={ui.muted}>{data.month}</span></div>
 
       <div className={styles.stats}>
-        <Stat label="Revenue" value={formatMoney(data.revenue)} />
-        <Stat label="Units sold" value={data.units} />
-        <Stat label="Profit" value={formatMoney(data.profit)} />
+        <Stat label="Revenue"><AnimatedNumber value={data.revenue} format={formatMoney} /></Stat>
+        <Stat label="Units sold"><AnimatedNumber value={data.units} /></Stat>
+        <Stat label="Profit"><AnimatedNumber value={data.profit} format={formatMoney} /></Stat>
       </div>
 
       <section className={ui.card}>
         <h2>Channel breakdown</h2>
-        {chartData.length === 0 ? <p className={ui.muted}>No sales yet this month.</p> : (
+        {chartData.length === 0 ? (
+          <div className={ui.empty}>
+            <div className={ui.emptyIcon}>📈</div>
+            <p>No sales yet this month.</p>
+            <span className={ui.muted}>Log your first sale and the channels will light up here.</span>
+          </div>
+        ) : (
           <div className={styles.chart}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -43,8 +50,8 @@ export default function Dashboard() {
                 <YAxis />
                 <Tooltip formatter={(v) => formatMoney(v)} />
                 <Legend />
-                <Bar dataKey="Revenue" fill="#6f9a7c" />
-                <Bar dataKey="Profit" fill="#d98a4e" />
+                <Bar dataKey="Revenue" fill="#6f9a7c" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Profit" fill="#d98a4e" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -53,7 +60,12 @@ export default function Dashboard() {
 
       <section className={ui.card}>
         <h2>Low stock</h2>
-        {data.lowStock.length === 0 ? <p className={ui.muted}>Everything is stocked above its threshold.</p> : (
+        {data.lowStock.length === 0 ? (
+          <div className={ui.empty}>
+            <div className={ui.emptyIcon}>✨</div>
+            <p>Everything is stocked above its threshold.</p>
+          </div>
+        ) : (
           <div className={ui.tableWrap}>
             <table className={ui.table}>
               <thead><tr><th>SKU</th><th>Product</th><th className={ui.num}>In stock</th><th className={ui.num}>Threshold</th></tr></thead>
@@ -74,11 +86,24 @@ export default function Dashboard() {
   );
 }
 
-function Stat({ label, value }) {
+function Stat({ label, children }) {
   return (
     <div className={styles.stat}>
       <div className={styles.statLabel}>{label}</div>
-      <div className={styles.statValue}>{value}</div>
+      <div className={styles.statValue}>{children}</div>
+    </div>
+  );
+}
+
+/** Shimmering placeholders keep the layout steady while data loads. */
+function DashboardSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading dashboard">
+      <div className={ui.pageHeader}><h1>Dashboard</h1></div>
+      <div className={styles.stats}>
+        {[0, 1, 2].map((k) => <div key={k} className={`${styles.stat} ${ui.skeleton}`} style={{ height: 96 }} />)}
+      </div>
+      <div className={`${ui.card} ${ui.skeleton}`} style={{ height: 320 }} />
     </div>
   );
 }

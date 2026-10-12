@@ -46,17 +46,21 @@ Want to host your own copy? The repo includes a Render blueprint and a step-by-s
 
 ## Capstone presentation
 
-The capstone presentation is a self-running slide deck in [`docs/presentation/`](docs/presentation/). Open `index.html` in any browser (no install, works offline) and press any key: it plays itself in about nine minutes, with a product tour, five step-by-step code walkthroughs, and a generated background score. Turn your sound on.
+The capstone presentation is a self-running slide deck in [`docs/presentation/`](docs/presentation/). Open `index.html` in any browser (no install, works offline) and press any key: it plays itself in about eight minutes, narrated by a generated voice over a soft cinematic score, with a product tour of the running app and five step-by-step code walkthroughs. Turn your sound on.
 
 | Key | Action |
 |---|---|
 | `P` | Pause or resume the presentation |
 | `→` / `←` | Next / previous step (code slides highlight line by line) |
+| `V` | Voice-over on or off (when off, slides advance on a timer) |
+| `C` | Captions on or off |
 | `M` | Mute or unmute the background score |
 | `N` | Show the narration text for each slide |
 | `F` | Fullscreen |
 
 Prefer a static copy? [`StockYard_Slides.pdf`](docs/presentation/StockYard_Slides.pdf) has every slide. To use your own background track instead of the built-in generated score, drop an `assets/music.mp3` next to `index.html`.
+
+The voice-over is generated locally with the open-source [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) text-to-speech model from the narration text embedded in `index.html`; the finished audio ships in `assets/vo/`, so nothing needs installing to watch. To change the script or the voice, see [`tools/voiceover/`](tools/voiceover/generate_voiceover.py).
 
 ---
 

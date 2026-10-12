@@ -12,6 +12,7 @@
   --bg: #f5ebe5; --surface: #fffdfb; --border: #e6d6cd; --text: #2e2a2c; --muted: #7b6f6c;
   --sage: #5c7a66; --sage-dark: #476552; --sage-deep: #34503f; --sage-soft: #e6eee7;
   --pink: #d9a3a0; --pink-soft: #f0d7d2; --orange: #d98a4e; --orange-light: #f2b077; --blue: #3b6a94;
+  --ease: cubic-bezier(.2,.7,.2,1);
   --display: 'Fraunces', Georgia, serif; --sans: 'DM Sans', system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
@@ -19,13 +20,13 @@ html, body { margin: 0; height: 100%; background: #1d2a22; font-family: var(--sa
 
 #stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center; }
 .slide {
-  position: absolute; inset: 0; padding: 56px 72px; background: var(--bg);
-  background-image: radial-gradient(900px 400px at 100% -10%, var(--pink-soft), transparent 60%);
-  opacity: 0; visibility: hidden; transform: translateX(24px); transition: opacity .45s, transform .45s, visibility .45s;
+  position: absolute; inset: 0; padding: 80px 72px 60px; background: transparent;
+  opacity: 0; visibility: hidden; transform: scale(1.025); filter: blur(7px);
+  transition: opacity .8s var(--ease), transform 1s var(--ease), filter .8s var(--ease), visibility .8s;
   display: flex; flex-direction: column;
 }
-.slide.active { opacity: 1; visibility: visible; transform: none; }
-.slide.past { transform: translateX(-24px); }
+.slide.active { opacity: 1; visibility: visible; transform: none; filter: none; }
+.slide.past { transform: scale(.985); }
 
 h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
 h2 { font-size: 42px; color: var(--sage-deep); margin-bottom: 8px; }
@@ -40,7 +41,7 @@ h2 { font-size: 42px; color: var(--sage-deep); margin-bottom: 8px; }
               linear-gradient(160deg, var(--sage), var(--sage-deep));
   color: #fff; justify-content: center; padding: 64px 80px;
 }
-.hero .brand { color: #fff; font-size: 128px; line-height: 1; }
+.hero .brand { color: #fff; font-size: 108px; line-height: 1; }
 .hero .brand b { color: var(--orange-light); }
 .hero p { font-family: var(--display); font-size: 32px; max-width: 760px; margin: 22px 0 36px; line-height: 1.3; }
 .hero .meta { font-size: 20px; opacity: .88; line-height: 1.7; }
@@ -117,11 +118,146 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
 .livebar a { color: var(--blue); font-weight: 700; }
 .livebar span { color: var(--muted); }
 
+
+/* ================= depth and motion ================= */
+@keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes grow { to { width: 76px; } }
+@keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(46px, -34px) scale(1.12); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes kb { from { transform: scale(1); } to { transform: scale(1.05); } }
+@keyframes letter { from { opacity: 0; transform: translateY(26px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes eq { to { height: 100%; } }
+
+#orbs { position: absolute; inset: 0; overflow: hidden; background: var(--bg); }
+#orbs i { position: absolute; width: 620px; height: 620px; border-radius: 50%; filter: blur(80px); opacity: .6;
+  transition: left 3.2s var(--ease), top 3.2s var(--ease); animation: drift 15s ease-in-out infinite alternate; }
+#orbs .o1 { background: rgba(110, 150, 122, .38); }
+#orbs .o2 { background: rgba(228, 158, 156, .55); animation-duration: 19s; animation-direction: alternate-reverse; }
+#orbs .o3 { background: rgba(245, 176, 120, .42); width: 480px; height: 480px; animation-duration: 23s; }
+#vig { position: absolute; inset: 0; pointer-events: none; z-index: 4; background: radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(52, 80, 63, .13) 100%); }
+
+.slide.active .kicker { animation: rise .7s .3s var(--ease) both; }
+.slide.active h2 { animation: rise .8s .4s var(--ease) both; }
+.slide.active .lead { animation: rise .8s .55s var(--ease) both; }
+.slide.active .walkgrid, .slide.active .arch, .slide.active .cards, .slide.active table.cmp, .slide.active .livebar { animation: rise .9s .6s var(--ease) both; }
+h2::after { content: ''; display: block; height: 4px; width: 0; margin-top: 10px; border-radius: 4px; background: linear-gradient(90deg, var(--orange), var(--pink)); }
+.slide.active h2::after { animation: grow .9s .95s var(--ease) forwards; }
+.hero h2::after { display: none; }
+
+.slide.hero { overflow: hidden; }
+.hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; animation: drift 17s ease-in-out infinite alternate; }
+.hero::before { width: 560px; height: 560px; right: -140px; top: -170px; background: radial-gradient(circle, rgba(242, 176, 119, .55), transparent 66%); }
+.hero::after { width: 520px; height: 520px; left: -150px; bottom: -190px; background: radial-gradient(circle, rgba(217, 163, 160, .5), transparent 66%); animation-direction: alternate-reverse; }
+.brand .ch { display: inline-block; opacity: 0; }
+.slide.active .brand .ch { animation: letter .9s calc(.6s + var(--i) * .08s) var(--ease) both; }
+.slide.active.hero p { animation: rise 1s 1.9s var(--ease) both; }
+.slide.active.hero .meta { animation: rise 1s 2.5s var(--ease) both; }
+.slide.active.hero .meta.fine { animation: rise 1s 3s var(--ease) both; }
+.hero .meta.fine { margin-top: 18px; font-size: 16px; opacity: .72; }
+.hero a { color: #fff; font-weight: 700; }
+
+/* step reveals: elements appear as the narration reaches them, the current one glows */
+.rv { opacity: 0; transform: translateY(20px) scale(.97); transition: opacity .8s var(--ease), transform .9s var(--ease), box-shadow .7s var(--ease), background .7s; }
+.rv.on { opacity: 1; transform: none; }
+.card.rv.now, .node.rv.now { box-shadow: 0 0 0 2px rgba(217, 138, 78, .6), 0 20px 50px rgba(217, 138, 78, .3); }
+tr.rv.now td { background: var(--orange-soft); }
+.callout.rv.now { text-shadow: 0 0 24px rgba(217, 138, 78, .45); }
+.bundle { border-color: transparent; transition: border-color 1s var(--ease); }
+.bundle::before { opacity: 0; transition: opacity 1s var(--ease); }
+.bundle.on { border-color: var(--pink); }
+.bundle.on::before { opacity: 1; }
+.arrow.rv.on { animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .45; } }
+
+.card { position: relative; overflow: hidden;
+  box-shadow: 0 1px 1px rgba(94, 60, 50, .05), 0 6px 14px rgba(94, 60, 50, .07), 0 22px 44px rgba(94, 60, 50, .1); }
+.card::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(135deg, rgba(255, 255, 255, .6), transparent 42%); }
+.card > * { position: relative; z-index: 1; }
+.node { box-shadow: 0 2px 4px rgba(94, 60, 50, .08), 0 14px 30px rgba(94, 60, 50, .12); }
+.panel, .code { box-shadow: 0 2px 4px rgba(40, 55, 45, .1), 0 18px 44px rgba(40, 55, 45, .2); }
+.frame { animation: float 8s ease-in-out infinite; }
+.shotimg.on { animation: kb 11s ease-out both; }
+.ln.on { box-shadow: inset 0 0 28px rgba(242, 176, 119, .13); }
+#bar { box-shadow: 0 0 14px var(--orange); }
+.slide > .dots { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); }
+
+#eq { position: fixed; left: 18px; bottom: 16px; display: flex; gap: 3px; align-items: flex-end; height: 18px; opacity: 0; transition: opacity .4s; z-index: 5; }
+body.speaking #eq { opacity: .9; }
+#eq i { width: 3px; height: 28%; background: var(--orange-light); border-radius: 2px; animation: eq .8s ease-in-out infinite alternate; }
+#eq i:nth-child(2) { animation-duration: .55s; animation-delay: -.2s; } #eq i:nth-child(3) { animation-duration: 1s; animation-delay: -.4s; }
+#eq i:nth-child(4) { animation-duration: .65s; animation-delay: -.1s; } #eq i:nth-child(5) { animation-duration: .9s; animation-delay: -.3s; }
+
+@media print {
+  #orbs, #vig, #eq { display: none !important; }
+  html, body { background: var(--bg) !important; }
+  .slide { filter: none !important; background: var(--bg) !important; }
+  .slide.hero { background: linear-gradient(160deg, var(--sage), var(--sage-deep)) !important; }
+  .rv { opacity: 1 !important; transform: none !important; }
+  .bundle { border-color: var(--pink) !important; } .bundle::before { opacity: 1 !important; }
+  .kicker, h2, .lead, .walkgrid, .arch, .cards, table.cmp, .livebar, .brand .ch, .hero p, .hero .meta { animation: none !important; opacity: 1 !important; }
+  h2::after { width: 76px !important; animation: none !important; }
+  .frame, .shotimg.on { animation: none !important; }
+}
+@media (prefers-reduced-motion: reduce) { .slide.active * , .hero::before, .hero::after, #orbs i, .frame { animation: none !important; } }
+
+
+/* ================= brand: mark + soft display wordmark with depth ================= */
+.lockup, .hero .brand { display: inline-flex; align-items: center; gap: .36em; line-height: 1; }
+.lmark { width: 1.28em; height: 1.28em; flex: none; filter: drop-shadow(0 5px 8px rgba(40, 62, 48, .4)); }
+.lword { font-family: var(--display); font-weight: 800; font-variation-settings: 'SOFT' 100, 'WONK' 0, 'opsz' 144;
+  letter-spacing: -.028em; color: var(--sage-deep); text-shadow: 0 1px 0 rgba(255, 255, 255, .75), 0 6px 12px rgba(52, 80, 63, .2); }
+.lword b { font-weight: inherit; background: linear-gradient(180deg, #f8bd88, #d6823f); -webkit-background-clip: text; background-clip: text;
+  color: transparent; text-shadow: none; filter: drop-shadow(0 3px 4px rgba(214, 130, 63, .35)); }
+.hero .lword { color: #fff; text-shadow: 0 1px 0 rgba(255, 255, 255, .3), 0 2px 0 rgba(0, 0, 0, .1), 0 3px 0 rgba(0, 0, 0, .09), 0 4px 0 rgba(0, 0, 0, .08), 0 24px 36px rgba(0, 0, 0, .42); }
+.hero .lword b { background: none; color: inherit; text-shadow: none; filter: drop-shadow(0 7px 10px rgba(0, 0, 0, .3)); }
+.hero .lword b .ch { background: linear-gradient(180deg, #ffd9ae 0%, #f2a15a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
+.hero .lmark { filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .4)); animation: markpop 1.1s .15s var(--ease) both, bob 7s 1.4s ease-in-out infinite; }
+@keyframes markpop { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes bob { 50% { transform: translateY(-7px); } }
+
+/* ================= persistent chrome: logo header + progress footer on every content slide ================= */
+#chrome { position: absolute; inset: 0; z-index: 3; pointer-events: none; transition: opacity .7s var(--ease); }
+#stage.on-hero #chrome { opacity: 0; }
+.c-top { position: absolute; left: 72px; right: 72px; top: 22px; display: flex; align-items: center; justify-content: space-between; }
+.c-top .lockup { font-size: 21px; }
+.c-chap { display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.c-chap em { display: none; }
+#pg { color: var(--orange); font-variant-numeric: tabular-nums; }
+.c-top::after { content: ''; position: absolute; left: 0; right: 0; bottom: -10px; height: 1px; background: linear-gradient(90deg, var(--border), transparent 85%); }
+.c-bot { position: absolute; left: 72px; right: 72px; bottom: 20px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+#pips { display: flex; gap: 5px; align-items: center; }
+#pips i { display: block; width: 10px; height: 4px; border-radius: 4px; background: rgba(92, 122, 102, .22); transition: width .6s var(--ease), background .6s; }
+#pips i.past { background: var(--sage); }
+#pips i.cur { width: 28px; background: linear-gradient(90deg, var(--orange), var(--orange-light)); box-shadow: 0 0 10px rgba(217, 138, 78, .55); }
+#bar { display: none; }
+.slide > .dots { bottom: 40px; }
+.panel .dots { bottom: 18px; }
+
+/* tactile finish: a whisper of film grain and idle-hiding controls */
+#grain { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: .09; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .2 0 0 0 0 .2 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#hud { transition: opacity .7s; }
+body.idle #hud { opacity: 0; }
+body.idle { cursor: none; }
+.pchrome { display: none; }
+
+@media print {
+  #chrome, #grain { display: none !important; }
+  .pchrome { display: flex; position: absolute; left: 72px; right: 72px; top: 22px; align-items: center; justify-content: space-between; z-index: 3; }
+  .pchrome .lockup { font-size: 21px; }
+  .pchrome span.n { font-size: 13px; letter-spacing: .14em; color: var(--orange); font-weight: 700; }
+  .slide.hero .pchrome { display: none; }
+  .hero .lmark { animation: none !important; opacity: 1 !important; }
+}
+@media (prefers-reduced-motion: reduce) { .hero .lmark { animation: none; } }
+
 /* chrome */
 #bar { position: fixed; left: 0; top: 0; height: 5px; background: var(--orange); width: 0; transition: width .4s; z-index: 5; }
 #hud { position: fixed; right: 16px; bottom: 12px; color: #cdd9d0; font-size: 13px; z-index: 5; opacity: .75; }
 #start { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 7; background: rgba(20,30,24,.88); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 15px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
 #start b { color: var(--orange-light); }
+#caption { position: fixed; left: 50%; bottom: 46px; transform: translateX(-50%); max-width: min(900px, 86vw); z-index: 6; background: rgba(20,30,24,.82); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 18px; line-height: 1.4; text-align: center; display: none; }
+#caption.on { display: block; }
 #notes { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(20,30,24,.95); color: #eef3ef; padding: 16px 28px 20px; font-size: 17px; line-height: 1.5; z-index: 6; display: none; max-height: 34vh; overflow: auto; }
 #notes.on { display: block; }
 #notes h4 { margin: 0 0 6px; color: var(--orange-light); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
@@ -136,52 +272,71 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
   .panel { display: flex; flex-direction: column; gap: 10px; }
   .note { position: static; opacity: 1 !important; transform: none; }
   .note .num { display: inline; font-size: 22px; } .note h3 { display: inline; font-size: 18px; } .note p { font-size: 14px; }
-  .dots, #bar, #hud, #notes, #start { display: none !important; }
+  .dots, #bar, #hud, #notes, #start, #caption { display: none !important; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 @media (prefers-reduced-motion: reduce) { .slide, .ln, .note { transition: none; } }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#82ac8f"/><stop offset="1" stop-color="#34503f"/></linearGradient>
+    <linearGradient id="lg-or" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8c392"/><stop offset="1" stop-color="#d6823f"/></linearGradient>
+    <linearGradient id="lg-cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dbe7de"/></linearGradient>
+    <linearGradient id="lg-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="lg-sh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.3" flood-color="#1c2f23" flood-opacity=".4"/></filter>
+    <symbol id="logo" viewBox="0 0 48 48">
+      <rect width="48" height="48" rx="12" fill="url(#lg-bg)"/>
+      <path d="M0 14C0 6.3 6.3 0 14 0h20c7.7 0 14 6.3 14 14v5C34 25.5 14 25.5 0 19z" fill="url(#lg-gl)"/>
+      <g filter="url(#lg-sh)">
+        <rect x="8.5" y="27" width="14" height="12.5" rx="3.2" fill="url(#lg-cr)"/>
+        <rect x="25.5" y="27" width="14" height="12.5" rx="3.2" fill="url(#lg-cr)"/>
+        <rect x="17" y="11.5" width="14" height="12.5" rx="3.2" fill="url(#lg-or)"/>
+      </g>
+      <path d="M11.5 31.5h8M28.5 31.5h8" stroke="#34503f" stroke-opacity=".28" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M20 16h8" stroke="#fff" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/>
+      <rect x=".6" y=".6" width="46.8" height="46.8" rx="11.4" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.2"/>
+    </symbol>
+  </defs>
+</svg>
 <div id="bar"></div>
 <div id="stage">
+<div id="orbs"><i class="o1"></i><i class="o2"></i><i class="o3"></i></div>
 
 <!-- 1 · Title -->
 <section class="slide hero" data-seconds="30">
-  <div class="brand">Stock<b>Yard</b></div>
+  <div class="brand"><svg class="lmark" viewBox="0 0 48 48"><use href="#logo"/></svg><span class="lword">Stock<b>Yard</b></span></div>
   <p>Inventory and sales, made for makers who outgrew spreadsheets.</p>
   <div class="meta">Nicholas Moppert<br>Software Engineering Capstone · Southern Careers Institute · Fall 2026<br>github.com/BDNIKKO/stockyard</div>
-  <div class="meta" style="margin-top:18px;font-size:16px;opacity:.7">A self-running presentation · about 9 minutes · sound on</div>
-  <aside hidden>Hi, I'm Nicholas, and this is StockYard, my capstone. In the next nine minutes I'll show you the problem it solves, the working app, the code behind it, and what I learned. Everything shown here is running live, and the code is in the repository you can clone today.</aside>
+  <div class="meta fine">A self-running presentation · about 8 minutes · sound on</div>
 </section>
 
 <!-- 2 · Problem -->
-<section class="slide" data-seconds="35">
+<section class="slide" data-seconds="50" data-steps="3">
   <div class="kicker">The problem</div>
   <h2>Spreadsheets break. Enterprise tools overcharge.</h2>
   <p class="lead">Solo makers selling on Etsy, at markets, and from their own sites hit a wall once inventory grows.</p>
   <div class="cards">
-    <div class="card"><div class="big">1</div><h3>Counts drift</h3><p>Sell a mug at a craft fair and Etsy still shows it in stock. Someone has to fix it by hand.</p></div>
-    <div class="card"><div class="big">2</div><h3>Profit is a guess</h3><p>Revenue is easy to see. What each channel actually earns after cost of goods is not.</p></div>
-    <div class="card"><div class="big">$50</div><h3>Per month, for features they'll never touch</h3><p>The usual escape from the spreadsheet is a heavy platform built for businesses ten times the size.</p></div>
+    <div class="card rv" data-r="1"><div class="big">1</div><h3>Counts drift</h3><p>Sell a mug at a craft fair and Etsy still shows it in stock. Someone has to fix it by hand.</p></div>
+    <div class="card rv" data-r="2"><div class="big">2</div><h3>Profit is a guess</h3><p>Revenue is easy to see. What each channel actually earns after cost of goods is not.</p></div>
+    <div class="card rv" data-r="3"><div class="big" data-count="50" data-prefix="$">$50</div><h3>Per month, for features they'll never touch</h3><p>The usual escape from the spreadsheet is a heavy platform built for businesses ten times the size.</p></div>
   </div>
-  <aside hidden>The gap is real. A maker selling candles or prints has outgrown a spreadsheet but doesn't need a fifty-dollar-a-month enterprise platform. StockYard fills that gap: precise inventory, multi-channel sales, and one focused dashboard.</aside>
 </section>
 
 <!-- 3 · Solution -->
-<section class="slide" data-seconds="35">
+<section class="slide" data-seconds="45" data-steps="3">
   <div class="kicker">The solution</div>
   <h2>One place for stock, sales, and the numbers</h2>
   <p class="lead">Every capability from the proposal's MVP shipped.</p>
   <div class="cards">
-    <div class="card"><h3>Product catalog</h3><ul><li>SKU, photo, cost, price, stock</li><li>Edit any time</li><li>Archive without losing history</li></ul></div>
-    <div class="card"><h3>Sales ledger</h3><ul><li>Log product, channel, quantity, price</li><li>Stock drops automatically</li><li>Filter by date and channel</li></ul></div>
-    <div class="card"><h3>Your own channels</h3><ul><li>Etsy, markets, direct, pop-ups</li><li>Rename or add anytime</li><li>Starter set on sign-up</li></ul></div>
-    <div class="card"><h3>Dashboard</h3><ul><li>Month revenue, units, profit</li><li>Channel breakdown chart</li><li>Low-stock restock list</li></ul></div>
-    <div class="card"><h3>Private by design</h3><ul><li>Secure sign-up and login</li><li>Stays signed in on reload</li><li>Shops can't see each other</li></ul></div>
-    <div class="card"><h3>Works anywhere</h3><ul><li>Phone, tablet, desktop</li><li>Breakpoints at 480, 768, 1024</li></ul></div>
+    <div class="card rv" data-r="1"><h3>Product catalog</h3><ul><li>SKU, photo, cost, price, stock</li><li>Edit any time</li><li>Archive without losing history</li></ul></div>
+    <div class="card rv" data-r="1"><h3>Sales ledger</h3><ul><li>Log product, channel, quantity, price</li><li>Stock drops automatically</li><li>Filter by date and channel</li></ul></div>
+    <div class="card rv" data-r="2"><h3>Your own channels</h3><ul><li>Etsy, markets, direct, pop-ups</li><li>Rename or add anytime</li><li>Starter set on sign-up</li></ul></div>
+    <div class="card rv" data-r="2"><h3>Dashboard</h3><ul><li>Month revenue, units, profit</li><li>Channel breakdown chart</li><li>Low-stock restock list</li></ul></div>
+    <div class="card rv" data-r="3"><h3>Private by design</h3><ul><li>Secure sign-up and login</li><li>Stays signed in on reload</li><li>Shops can't see each other</li></ul></div>
+    <div class="card rv" data-r="3"><h3>Works anywhere</h3><ul><li>Phone, tablet, desktop</li><li>Breakpoints at 480, 768, 1024</li></ul></div>
   </div>
-  <aside hidden>Six areas. Products, a sales ledger, custom channels, a dashboard, authentication, and a responsive layout. The product tour follows.</aside>
 </section>
 
 <!-- 4 · Product tour -->
@@ -206,32 +361,30 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
     </div>
   </div>
   <div class="livebar">Try it yourself: <a href="https://stockyard-ucr9.onrender.com" target="_blank" rel="noopener">stockyard-ucr9.onrender.com</a> <span>· create an account in seconds</span></div>
-  <aside hidden>This is the real application, running on Render with a managed PostgreSQL database. First the dashboard: the month's revenue, units and profit, a chart of which sales channel earns the most, and a restock list. Then the catalog, with photos, costs, prices and low-stock warnings. Then the sales page, where logging a sale lowers stock automatically and the ledger can be filtered by date and channel. Finally the same app on a phone-sized screen. You can try the live site yourself at the address on screen.</aside>
 </section>
 
 <!-- 5 · Architecture -->
-<section class="slide" data-seconds="40">
+<section class="slide" data-seconds="45" data-steps="3">
   <div class="kicker">Architecture</div>
   <h2>Layered, simple to run</h2>
   <p class="lead">A React single-page app talks JSON over HTTP to a layered Spring Boot API backed by PostgreSQL.</p>
   <div class="arch">
-    <div class="bundle">
-      <div class="node"><strong>React 18 + Vite</strong><span>React Router, Axios interceptors, Recharts, CSS Modules</span></div>
-      <div class="arrow">⇄</div>
-      <div class="node"><strong>Controllers</strong><span>REST + validation</span></div>
-      <div class="arrow">→</div>
-      <div class="node"><strong>Services</strong><span>Business rules, transactions</span></div>
-      <div class="arrow">→</div>
-      <div class="node"><strong>Repositories</strong><span>Spring Data JPA</span></div>
+    <div class="bundle" data-r="3">
+      <div class="node rv" data-r="1"><strong>React 18 + Vite</strong><span>React Router, Axios interceptors, Recharts, CSS Modules</span></div>
+      <div class="arrow rv" data-r="2">⇄</div>
+      <div class="node rv" data-r="2"><strong>Controllers</strong><span>REST + validation</span></div>
+      <div class="arrow rv" data-r="2">→</div>
+      <div class="node rv" data-r="2"><strong>Services</strong><span>Business rules, transactions</span></div>
+      <div class="arrow rv" data-r="2">→</div>
+      <div class="node rv" data-r="2"><strong>Repositories</strong><span>Spring Data JPA</span></div>
     </div>
-    <div class="arrow">→</div>
-    <div class="node accent"><strong>PostgreSQL 16</strong><span>Flyway-versioned schema</span></div>
+    <div class="arrow rv" data-r="3">→</div>
+    <div class="node accent rv" data-r="3"><strong>PostgreSQL 16</strong><span>Flyway-versioned schema</span></div>
   </div>
-  <div>
+  <div class="rv" data-r="2">
     <span class="pill">Java 21</span><span class="pill">Spring Boot 3.5</span><span class="pill">Spring Security + JWT</span>
     <span class="pill">DTO records</span><span class="pill">OpenAPI docs</span><span class="pill">Docker Compose</span><span class="pill">GitHub Actions CI</span>
   </div>
-  <aside hidden>The back end follows strict layers: controllers, services, repositories, DTOs. The schema is versioned with Flyway. In production the React build is bundled into the Spring Boot jar, so the whole app ships as a single Docker image alongside Postgres. Next, the code behind it, following one request from the browser to the database.</aside>
 </section>
 
 <!-- 6 · Walk: request -->
@@ -249,7 +402,6 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
       <div class="note" data-s="4"><div class="num">4</div><h3>Ledger in the same transaction</h3><p>The sale copies the unit cost at that moment, then saves. <b>@Transactional</b> makes stock and ledger commit together, or not at all.</p></div>
     </div>
   </div>
-  <aside hidden>Follow one request. Step 1: the controller is thin. It gets the authenticated maker from the JWT and validates the body. Step 2: every lookup includes the maker id, so you can only touch your own data. Step 3: a single guarded UPDATE decides whether stock is available, which removes race conditions. Step 4: the sale is saved in the same transaction, with a snapshot of the unit cost so past profit never changes.</aside>
 </section>
 
 <!-- 7 · Walk: security -->
@@ -267,7 +419,6 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
       <div class="note" data-s="4"><div class="num">4</div><h3>Signed, expiring tokens</h3><p>Tokens carry the maker id and an expiry, signed with a secret from the environment. Passwords are stored only as BCrypt hashes.</p></div>
     </div>
   </div>
-  <aside hidden>Security is stateless. A filter validates the JWT on each request. Only register and login are public; every other API route needs a token. Tokens are signed with a secret that comes from an environment variable, and passwords are stored as BCrypt hashes.</aside>
 </section>
 
 <!-- 8 · Walk: database -->
@@ -285,7 +436,6 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
       <div class="note" data-s="4"><div class="num">4</div><h3>Indexed for the questions we ask</h3><p>Maker plus date range is exactly how the dashboard and ledger filter. Flyway applies this same schema in every environment.</p></div>
     </div>
   </div>
-  <aside hidden>The database enforces the rules. Foreign keys keep data normalized, CHECK constraints prevent invalid values, and a unique constraint keeps SKUs unique per shop. The sales table snapshots unit cost so history never changes. An index on maker and date matches the dashboard and ledger queries, and Flyway applies the identical schema everywhere.</aside>
 </section>
 
 <!-- 9 · Walk: frontend -->
@@ -303,7 +453,6 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
       <div class="note" data-s="4"><div class="num">4</div><h3>Tokens, not a UI library</h3><p>CSS Modules over shared design tokens. The whole green-and-orange re-theme was a handful of variables.</p></div>
     </div>
   </div>
-  <aside hidden>On the front end, pages are thin. A shared Axios client handles authentication. The dashboard reshapes the totals into chart data, Recharts renders it inside a responsive container, and CSS Modules with design tokens control the look at the 480, 768 and 1024 pixel breakpoints, with no third-party component library.</aside>
 </section>
 
 <!-- 10 · Walk: tests -->
@@ -322,48 +471,102 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
       <div class="note" data-s="5"><div class="num">5</div><h3>Shops stay separate</h3><p>A second maker can't sell the first maker's product: 404. Isolation is tested, not assumed.</p></div>
     </div>
   </div>
-  <aside hidden>The integration tests boot the full app with the real migrations. They prove a sale works, that overselling is refused and leaves no trace, that the dashboard math is exact, and that one maker cannot touch another maker's data. All three tests pass on every build, and CI runs them on each push.</aside>
 </section>
 
 <!-- 11 · Delivery -->
-<section class="slide" data-seconds="35">
+<section class="slide" data-seconds="40" data-steps="3">
   <div class="kicker">Quality and delivery</div>
   <h2>Containerized, automated, one command to run</h2>
   <div class="cards">
-    <div class="card"><h3>Automated checks</h3><ul><li>Backend tests with Maven</li><li>Front-end production build</li><li>GitHub Actions on every push</li></ul></div>
-    <div class="card"><h3>Anyone can run it</h3><ul><li><b>docker compose up --build</b></li><li>Open localhost:8080</li><li>Postgres included</li></ul></div>
-    <div class="card"><h3>Ready to host</h3><ul><li>Single Docker image</li><li>Render blueprint in the repo</li><li>Secrets from environment</li></ul></div>
+    <div class="card rv" data-r="1"><h3>Anyone can run it</h3><ul><li><b>docker compose up --build</b></li><li>Open localhost:8080</li><li>Postgres included</li></ul></div>
+    <div class="card rv" data-r="2"><h3>Ready to host</h3><ul><li>Single Docker image</li><li>Render blueprint in the repo</li><li>Secrets from environment</li></ul></div>
+    <div class="card rv" data-r="3"><h3>Automated checks</h3><ul><li>Backend tests with Maven</li><li>Front-end production build</li><li>GitHub Actions on every push</li></ul></div>
   </div>
-  <aside hidden>Setup for a reviewer is one command. The repo also has a Render blueprint for a hosted copy, and CI builds and tests on every push.</aside>
 </section>
 
 <!-- 12 · Reflection -->
-<section class="slide" data-seconds="45">
+<section class="slide" data-seconds="50" data-steps="3">
   <div class="kicker">Reflection</div>
   <h2>What changed, and what I learned</h2>
   <table class="cmp">
     <tr><th style="width:26%">Proposal</th><th style="width:34%">What I shipped</th><th>Why</th></tr>
-    <tr><td>Azure App Service + Static Web Apps</td><td>One Docker image, Render blueprint</td><td>Anyone can run or view it without cloud credentials</td></tr>
-    <tr><td>Caching layer for reads</td><td>Aggregates computed in PostgreSQL</td><td>Fast enough at this scale; less to maintain</td></tr>
-    <tr><td>Azure Blob image storage</td><td>Local disk behind a storage class</td><td>Simple now; one class to swap later</td></tr>
+    <tr class="rv" data-r="1"><td>Azure App Service + Static Web Apps</td><td>One Docker image, Render blueprint</td><td>Anyone can run or view it without cloud credentials</td></tr>
+    <tr class="rv" data-r="2"><td>Caching layer for reads</td><td>Aggregates computed in PostgreSQL</td><td>Fast enough at this scale; less to maintain</td></tr>
+    <tr class="rv" data-r="2"><td>Azure Blob image storage</td><td>Local disk behind a storage class</td><td>Simple now; one class to swap later</td></tr>
   </table>
-  <p class="callout">Lesson: push consistency into the database, ship the simplest architecture that works, and keep the docs honest about what's real.</p>
-  <aside hidden>Three deliberate deviations. I simplified hosting to a single container so a reviewer can run it with one command, I skipped a separate cache because the aggregate queries are fast, and images stay on local disk behind one class that's ready for object storage. The biggest lesson: let the database enforce consistency, and describe the system as it actually is.</aside>
+  <p class="callout rv" data-r="3">Lesson: push consistency into the database, ship the simplest architecture that works, and keep the docs honest about what's real.</p>
 </section>
 
 <!-- 13 · Close -->
 <section class="slide hero" data-seconds="25">
-  <div class="brand" style="font-size:88px">Stock<b>Yard</b></div>
-  <p>Next up: restock email alerts, CSV import, a public catalog page, and tags.</p>
-  <div class="meta">Thanks for watching.<br>Live: stockyard-ucr9.onrender.com<br>github.com/BDNIKKO/stockyard<br>Nicholas Moppert · moppertn@gmail.com</div>
-  <aside hidden>Roadmap: email alerts for low stock, CSV import of historical sales, a public read-only catalog page, product tags, and hardened auth with refresh-token cookies. Thank you for watching, and please try the live site.</aside>
+  <div class="brand" style="font-size:78px"><svg class="lmark" viewBox="0 0 48 48"><use href="#logo"/></svg><span class="lword">Stock<b>Yard</b></span></div>
+  <p>Know what you have. Know what you sold. Know where it sold.</p>
+  <div class="meta">Thanks for watching.<br>Live: <a href="https://stockyard-ucr9.onrender.com" target="_blank" rel="noopener">stockyard-ucr9.onrender.com</a><br>github.com/BDNIKKO/stockyard<br>Nicholas Moppert · moppertn@gmail.com</div>
+  <div class="meta fine">Next up: restock alerts · CSV import · public catalog page · tags</div>
 </section>
 
+<div id="chrome">
+  <div class="c-top">
+    <span class="lockup"><svg class="lmark" viewBox="0 0 48 48"><use href="#logo"/></svg><span class="lword">Stock<b>Yard</b></span></span>
+    <span class="c-chap"><em id="chap"></em><span id="pg"></span></span>
+  </div>
+  <div class="c-bot"><span id="liveurl">stockyard-ucr9.onrender.com</span><div id="pips"></div></div>
+</div>
+<div id="grain"></div>
+<div id="vig"></div>
 </div>
 <div id="notes"><h4>Speaker notes</h4><div id="notesText"></div></div>
+<div id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+<div id="caption"></div>
 <div id="hud"></div>
 <div id="start">▶ Press any key to <b>play the presentation</b> &nbsp;·&nbsp; ♪ sound on &nbsp;·&nbsp; M to mute</div>
 
+<script id="narration" type="application/json">
+{
+ "1_1": "Every maker has a story. The candles. The ceramics. The prints. And behind every one of them... a spreadsheet, quietly falling apart. Meet StockYard. Inventory and sales, for makers who've outgrown the spreadsheet. A capstone project, by Nicholas Moppert.",
+ "2_1": "It starts small. A spreadsheet. A few products. A handful of sales. Then one Saturday, a mug sells at the craft fair, and Etsy still says it's in stock. The counts drift. And nobody notices... until a customer does.",
+ "2_2": "Then comes the real question. Which channel actually makes money? Revenue is easy to see. But once you count the cost of making each piece, profit becomes a guess.",
+ "2_3": "And the usual escape? A heavy platform. Around fifty dollars a month. Packed with features a small shop will never touch. There has to be something in between.",
+ "3_1": "There is. StockYard. One focused place for the whole shop. A catalog, with photos, costs, and prices. And a sales ledger that lowers stock the instant you sell.",
+ "3_2": "Your own channels. Etsy, markets, pop-ups, wherever you sell. And a dashboard that turns it all into revenue, profit, and a restock list. At a glance.",
+ "3_3": "Every account is private. Every screen is responsive. From a phone at the market, to a desktop at home. Simple. And sharp.",
+ "4_1": "Here it is. Running live. The dashboard: your whole month, in one glance. Revenue. Units. Profit. And which channel is quietly carrying the shop.",
+ "4_2": "The catalog. Every product with its photo, cost, price, and stock. Running low? It tells you. Retiring something? Archive it. History stays perfectly intact.",
+ "4_3": "Logging a sale takes seconds. Pick the product. Pick the channel. And stock drops automatically. Etsy against the market, filtered in one click.",
+ "4_4": "And it fits in your pocket. The same app, on a phone. Nothing spills. Nothing clips. Every number, right where you need it.",
+ "5_1": "Now, a look under the hood. At the front, a React app. Fast, responsive, and styled from a single set of design tokens.",
+ "5_2": "Behind it, a Spring Boot A P I, built in clean layers. Controllers. Services. Repositories. Each one doing exactly one job.",
+ "5_3": "And at the foundation, Postgres, with every change to its schema versioned by Flyway. The whole system ships as a single Docker image. Now, let's follow one request, all the way down.",
+ "6_1": "A sale begins at a thin controller. Spring Security brings the signed-in maker. And validation turns bad input away at the door.",
+ "6_2": "Every lookup carries the maker's I D. Someone else's product? It simply doesn't exist for you. Not an error you can probe. A clean not-found.",
+ "6_3": "And now, the moment that matters. One guarded statement lowers the stock, only if enough remains. If nothing changes, the sale is refused. No race conditions. No overselling. Ever.",
+ "6_4": "Last, the sale is written in the same transaction, with a snapshot of the cost. Stock and ledger, together. Or not at all.",
+ "7_1": "Security is stateless. The server remembers nothing between requests, so every request has to prove who it is.",
+ "7_2": "A filter stands at the door. It reads the token, checks the signature and the expiry, and names the maker behind the request.",
+ "7_3": "Locked by default. Only sign-up and login are open. Every other A P I route needs a valid token.",
+ "7_4": "Tokens are signed, and they expire, with the secret kept safely in the environment. Passwords are stored only as B-Crypt hashes.",
+ "8_1": "The database protects itself. Fully normalized, with foreign keys tying each sale to its maker, its product, and its channel.",
+ "8_2": "The rules live here, too. No negative stock. No negative prices. One S K U per shop. Even a bug in the app can't write bad data.",
+ "8_3": "Each sale remembers its own cost. So when prices change next month, last month's profit doesn't.",
+ "8_4": "Indexes match the questions the app really asks. By shop. By channel. By date range. And Flyway builds the very same schema, everywhere.",
+ "9_1": "On the front end, pages stay thin. One shared client adds the token to every request, and handles an expired session in a single place.",
+ "9_2": "The dashboard takes the server's totals and shapes them for the chart, including profit, channel by channel.",
+ "9_3": "Recharts draws it inside a responsive container. So on a phone, the chart simply resizes. Nothing clips.",
+ "9_4": "And the styling? C S S Modules, over shared design tokens. No component library. The whole green and orange theme is a handful of variables.",
+ "10_1": "And none of it is taken on faith. It's tested. A normal sale goes through. Ten in stock, eight sold.",
+ "10_2": "Ask for more than what's left, and it's refused.",
+ "10_3": "And afterwards, nothing has changed. Stock and ledger, exactly as they were.",
+ "10_4": "The dashboard math? Exact. Right down to the cent.",
+ "10_5": "And one shop can never touch another's data. Every build passes, and the pipeline runs on every push.",
+ "11_1": "Getting started takes one command. Clone the repository. Run Docker Compose. And the whole system, database included, is up in minutes.",
+ "11_2": "Want it online? A Render blueprint publishes a hosted copy. The very one you've been watching.",
+ "11_3": "And every push to the repository is built and tested, automatically. So it stays exactly as reliable as it looks.",
+ "12_1": "Of course, the plan evolved. The proposal called for separate Azure services. Instead, one Docker image, so anyone can run it, with no cloud credentials at all.",
+ "12_2": "A caching layer? Skipped. The database aggregates are already fast. And photos live on disk, behind a single class that's ready for object storage.",
+ "12_3": "The lesson? Let the database enforce consistency. Build the simplest thing that works. And keep the documentation honest.",
+ "13_1": "That's StockYard. Know what you have. Know what you sold. Know where it sold. Next up: restock alerts, C S V import, a public catalog page, and tags. Try it live. The link is on screen. Thanks for watching."
+}
+</script>
 <script>
 /* ============================ slides ============================ */
 const slides = [...document.querySelectorAll('.slide')];
@@ -373,6 +576,11 @@ const hud = document.getElementById('hud');
 const notes = document.getElementById('notes');
 const notesText = document.getElementById('notesText');
 let i = 0, step = 1, timer = null, playing = false;
+const narration = JSON.parse(document.getElementById('narration').textContent);
+const caption = document.getElementById('caption');
+let voiceOn = true, captionsOn = false, voiceEl = null, duckF = 1;
+const MIN_DWELL = 3500, GAP = 1000, SLIDE_GAP = 1300, LEAD_IN = 900;   // ms: never rush a step, and breathe between steps and slides
+const stepKey = () => `${i + 1}_${step}`;
 const stepsOf = (el) => +el.dataset.steps || 1;
 
 slides.forEach((el) => {            // step dots
@@ -381,7 +589,7 @@ slides.forEach((el) => {            // step dots
     const d = document.createElement('div');
     d.className = 'dots';
     d.innerHTML = '<i></i>'.repeat(n);
-    el.querySelector('.panel').appendChild(d);
+    (el.querySelector('.panel') || el).appendChild(d);
   }
 });
 
@@ -401,14 +609,84 @@ function render() {
     el.querySelectorAll('.note').forEach((n) => n.classList.toggle('on', n.dataset.s === cur));
     el.querySelectorAll('.shotimg').forEach((n) => n.classList.toggle('on', n.dataset.s === cur));
     el.querySelectorAll('.dots i').forEach((d, k) => d.classList.toggle('on', k + 1 === step));
+    el.querySelectorAll('[data-r]').forEach((n) => {                       // cumulative reveals; the current one glows
+      const r = +n.dataset.r;
+      n.classList.toggle('on', step >= r);
+      n.classList.toggle('now', step === r && !n.classList.contains('bundle'));
+    });
+    el.querySelectorAll('.rv.on .big[data-count]').forEach((b) => { if (!b.dataset.done) { b.dataset.done = 1; countUp(b); } });
   }
+  positionOrbs(i);
+  updateChrome();
   bar.style.width = ((i + 1) / slides.length * 100) + '%';
   const a = el.querySelector('aside');
-  notesText.textContent = a ? a.textContent : '';
-  hud.textContent = `${i + 1} / ${slides.length}  ·  ← → navigate · P ${playing ? 'pause' : 'play'} · M music${musicOn ? ' (on)' : ' (off)'} · N notes · F fullscreen`;
+  const line = narration[stepKey()] || (a ? a.textContent : '');
+  notesText.textContent = line;
+  caption.textContent = line;
   history.replaceState(null, '', '#' + (i + 1));
-  if (playing) schedule();
+  updateHud();
+  if (playing) schedule(); else stopVoice();
 }
+function updateHud() {
+  hud.textContent = `${i + 1} / ${slides.length}  ·  ← → navigate · P ${playing ? 'pause' : 'play'} · V voice${voiceOn ? '' : ' (off)'} · M music${musicOn ? '' : ' (off)'} · C captions · N notes · F fullscreen`;
+}
+function countUp(el) {
+  const target = +el.dataset.count, pre = el.dataset.prefix || '', t0 = performance.now(), dur = 1700;
+  (function frame(t) {
+    const k = Math.min((t - t0) / dur, 1);
+    el.textContent = pre + Math.round(target * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) requestAnimationFrame(frame);
+  })(t0);
+}
+function positionOrbs(n) {
+  document.querySelectorAll('#orbs i').forEach((o, k) => {
+    const a = Math.sin((n + 1) * (k + 2) * 12.9898) * 43758.5453, b = Math.sin((n + 3) * (k + 5) * 78.233) * 12345.6789;
+    o.style.left = (-140 + (a - Math.floor(a)) * 1000) + 'px';
+    o.style.top = (-170 + (b - Math.floor(b)) * 620) + 'px';
+  });
+}
+function wrapLetters(root) {                  // wordmark letters animate in one by one
+  let n = 0;
+  (function walk(node) {
+    [...node.childNodes].forEach((c) => {
+      if (c.nodeType === 3) {
+        const f = document.createDocumentFragment();
+        [...c.textContent].forEach((ch) => { const sp = document.createElement('span'); sp.className = 'ch'; sp.style.setProperty('--i', n++); sp.textContent = ch; f.appendChild(sp); });
+        c.replaceWith(f);
+      } else walk(c);
+    });
+  })(root);
+}
+document.querySelectorAll('.hero .lword').forEach(wrapLetters);
+
+/* ---- chrome: progress pips, chapter label, print headers, idle-hiding controls ---- */
+const pips = document.getElementById('pips');
+slides.forEach(() => pips.appendChild(document.createElement('i')));
+const chapEl = document.getElementById('chap'), pgEl = document.getElementById('pg');
+const pad2 = (n) => String(n).padStart(2, '0');
+slides.forEach((el, k) => {
+  if (el.classList.contains('hero')) return;
+  const pc = document.createElement('div');
+  pc.className = 'pchrome';
+  pc.innerHTML = `<span class="lockup"><svg class="lmark" viewBox="0 0 48 48"><use href="#logo"/></svg><span class="lword">Stock<b>Yard</b></span></span><span class="n">${pad2(k + 1)} / ${pad2(slides.length)}</span>`;
+  el.appendChild(pc);
+});
+function updateChrome() {
+  const el = slides[i];
+  stage.classList.toggle('on-hero', el.classList.contains('hero'));
+  const kick = el.querySelector('.kicker');
+  chapEl.textContent = kick ? kick.textContent : '';
+  pgEl.textContent = `${pad2(i + 1)} / ${pad2(slides.length)}`;
+  [...pips.children].forEach((p, k) => { p.className = k < i ? 'past' : k === i ? 'cur' : ''; });
+}
+let idleTimer;
+function wake() {
+  document.body.classList.remove('idle');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => document.body.classList.add('idle'), 2600);
+}
+['mousemove', 'keydown', 'click', 'touchstart'].forEach((ev) => addEventListener(ev, wake, { passive: true }));
+wake();
 function go(n, atEnd) {
   i = Math.max(0, Math.min(slides.length - 1, n));
   step = atEnd ? stepsOf(slides[i]) : 1;
@@ -417,26 +695,52 @@ function go(n, atEnd) {
 function next() { if (step < stepsOf(slides[i])) { step++; render(); } else if (i < slides.length - 1) go(i + 1); }
 function prev() { if (step > 1) { step--; render(); } else if (i > 0) go(i - 1, true); }
 
-function schedule() {
+function setDuck(on) { duckF = on ? 0.42 : 1; applyMusicLevel(); }
+function stopVoice() {
   clearTimeout(timer);
-  const secs = (+slides[i].dataset.seconds || 30) / stepsOf(slides[i]);
-  timer = setTimeout(() => {
-    const last = i === slides.length - 1 && step === stepsOf(slides[i]);
-    if (last) togglePlay(false); else next();
-  }, secs * 1000);
+  if (voiceEl) { voiceEl.onended = voiceEl.onerror = null; voiceEl.pause(); voiceEl = null; }
+  document.body.classList.remove('speaking');
+  setDuck(false);
+}
+function advance() {
+  const last = i === slides.length - 1 && step === stepsOf(slides[i]);
+  if (last) togglePlay(false); else next();
+}
+/* Narration-driven pacing: each step lasts as long as its voice clip (the slide's data-seconds is only a fallback). */
+function schedule() {
+  stopVoice();
+  if (!playing) return;
+  const fallback = () => { timer = setTimeout(advance, ((+slides[i].dataset.seconds || 30) / stepsOf(slides[i])) * 1000); };
+  if (!voiceOn) return fallback();
+  const t0 = performance.now();
+  const a = new Audio(`assets/vo/${stepKey()}.mp3`);
+  const lastStep = step === stepsOf(slides[i]);
+  voiceEl = a;
+  a.onerror = () => { voiceEl = null; document.body.classList.remove('speaking'); setDuck(false); fallback(); };
+  a.onended = () => {
+    voiceEl = null; document.body.classList.remove('speaking'); setDuck(false);
+    const wait = Math.max(MIN_DWELL - (performance.now() - t0), 0) + GAP + (lastStep ? SLIDE_GAP : 0);
+    timer = setTimeout(advance, wait);
+  };
+  timer = setTimeout(() => {            // let the slide settle before the voice begins
+    setDuck(true);
+    document.body.classList.add('speaking');
+    a.play().catch(() => a.onerror && a.onerror());
+  }, LEAD_IN);
 }
 function togglePlay(force) {
   playing = force ?? !playing;
-  clearTimeout(timer);
   render();
 }
+function toggleVoice() { voiceOn = !voiceOn; updateHud(); if (playing) schedule(); }
+function toggleCaptions() { captionsOn = !captionsOn; caption.classList.toggle('on', captionsOn); }
 
 /* ============================ music ============================ */
 let musicOn = false, musicEl = null, actx = null, master = null, bus = null, air = null, genStarted = false, nextT = 0, barIdx = 0;
 
 function startMusic() {
   musicOn = true;
-  if (genStarted) { actx.resume(); fadeGen(0.5); return; }
+  if (genStarted) { actx.resume(); applyMusicLevel(); return; }
   if (!musicEl) {
     musicEl = new Audio('assets/music.mp3');       // drop your own file here to override the generated score
     musicEl.loop = true; musicEl.volume = 0.4;
@@ -449,7 +753,12 @@ function stopMusic() {
   if (musicEl) musicEl.pause();
   if (genStarted) fadeGen(0);
 }
-function toggleMusic() { musicOn ? stopMusic() : startMusic(); render(); }
+function toggleMusic() { musicOn ? stopMusic() : startMusic(); updateHud(); }
+function applyMusicLevel() {
+  if (!musicOn) return;
+  if (genStarted) fadeGen(0.5 * duckF);
+  if (musicEl) musicEl.volume = 0.4 * duckF;
+}
 function fadeGen(v) { master.gain.cancelScheduledValues(actx.currentTime); master.gain.setTargetAtTime(v, actx.currentTime, 0.6); }
 
 /* Generated score: D minor, Dm - Bb - Gm - A, slow pads, deep bass, timpani, sparse melody. */
@@ -580,6 +889,8 @@ addEventListener('keydown', (e) => {
   else if (k === 'end') go(slides.length - 1);
   else if (k === 'p') togglePlay();
   else if (k === 'm') toggleMusic();
+  else if (k === 'v') toggleVoice();
+  else if (k === 'c') toggleCaptions();
   else if (k === 'n') notes.classList.toggle('on');
   else if (k === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
 });
