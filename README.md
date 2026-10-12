@@ -46,14 +46,14 @@ Want to host your own copy? The repo includes a Render blueprint and a step-by-s
 
 ## Capstone presentation
 
-A self-playing slide deck lives in [`docs/presentation/`](docs/presentation/). Open `index.html` in any browser (no install, works offline) and press any key to begin.
+The capstone presentation is a self-running slide deck in [`docs/presentation/`](docs/presentation/). Open `index.html` in any browser (no install, works offline) and press any key: it plays itself in about nine minutes, with a product tour, five step-by-step code walkthroughs, and a generated background score. Turn your sound on.
 
 | Key | Action |
 |---|---|
+| `P` | Pause or resume the presentation |
 | `→` / `←` | Next / previous step (code slides highlight line by line) |
-| `P` | Auto-play the whole talk (about 9½ minutes) |
 | `M` | Mute or unmute the background score |
-| `N` | Show speaker notes, including the live-demo script |
+| `N` | Show the narration text for each slide |
 | `F` | Fullscreen |
 
 Prefer a static copy? [`StockYard_Slides.pdf`](docs/presentation/StockYard_Slides.pdf) has every slide. To use your own background track instead of the built-in generated score, drop an `assets/music.mp3` next to `index.html`.

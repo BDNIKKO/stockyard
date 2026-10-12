@@ -102,6 +102,21 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
 .cmp tr:last-child td { border-bottom: 0; }
 .callout { margin-top: 22px; font-size: 22px; color: var(--sage-deep); font-weight: 600; }
 
+
+/* ---- product tour ---- */
+.frame { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: #fff; border: 1px solid var(--border); box-shadow: 0 4px 8px rgba(40,55,45,.1), 0 20px 44px rgba(40,55,45,.22); min-height: 0; }
+.chrome { flex: none; display: flex; align-items: center; gap: 7px; padding: 9px 14px; background: #efe3dc; border-bottom: 1px solid var(--border); }
+.chrome i { width: 11px; height: 11px; border-radius: 50%; background: #d4bfb4; }
+.chrome i:nth-child(1) { background: var(--pink); } .chrome i:nth-child(2) { background: var(--orange-light); } .chrome i:nth-child(3) { background: #9cc3a4; }
+.chrome span { margin-left: 12px; flex: 1; background: #fffdfb; border-radius: 999px; padding: 3px 14px; font-size: 13px; color: var(--muted); }
+.viewport { position: relative; flex: 1; min-height: 0; background: linear-gradient(135deg, var(--pink-soft), var(--sage-soft)); }
+.shotimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; opacity: 0; transform: scale(1.02); transition: opacity .5s, transform .8s; }
+.shotimg.on { opacity: 1; transform: none; }
+.shotimg.phone { object-fit: contain; object-position: center; padding: 14px 0; filter: drop-shadow(0 10px 24px rgba(40,55,45,.3)); }
+.livebar { margin-top: 14px; font-size: 18px; color: var(--sage-deep); }
+.livebar a { color: var(--blue); font-weight: 700; }
+.livebar span { color: var(--muted); }
+
 /* chrome */
 #bar { position: fixed; left: 0; top: 0; height: 5px; background: var(--orange); width: 0; transition: width .4s; z-index: 5; }
 #hud { position: fixed; right: 16px; bottom: 12px; color: #cdd9d0; font-size: 13px; z-index: 5; opacity: .75; }
@@ -117,6 +132,7 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
   #stage { position: static; transform: none !important; width: auto; height: auto; }
   .slide { position: relative; opacity: 1 !important; visibility: visible !important; transform: none !important; width: 1280px; height: 720px; page-break-after: always; break-after: page; }
   .ln { opacity: 1 !important; }
+  .shotimg[data-s="1"] { opacity: 1 !important; }
   .panel { display: flex; flex-direction: column; gap: 10px; }
   .note { position: static; opacity: 1 !important; transform: none; }
   .note .num { display: inline; font-size: 22px; } .note h3 { display: inline; font-size: 18px; } .note p { font-size: 14px; }
@@ -135,7 +151,8 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
   <div class="brand">Stock<b>Yard</b></div>
   <p>Inventory and sales, made for makers who outgrew spreadsheets.</p>
   <div class="meta">Nicholas Moppert<br>Software Engineering Capstone · Southern Careers Institute · Fall 2026<br>github.com/BDNIKKO/stockyard</div>
-  <aside hidden>Hi, I'm Nicholas, and this is StockYard, my capstone. In the next nine minutes I'll show you the problem it solves, the working app, the code behind it, and what I learned. Everything I show runs from the repository you can clone today.</aside>
+  <div class="meta" style="margin-top:18px;font-size:16px;opacity:.7">A self-running presentation · about 9 minutes · sound on</div>
+  <aside hidden>Hi, I'm Nicholas, and this is StockYard, my capstone. In the next nine minutes I'll show you the problem it solves, the working app, the code behind it, and what I learned. Everything shown here is running live, and the code is in the repository you can clone today.</aside>
 </section>
 
 <!-- 2 · Problem -->
@@ -164,18 +181,32 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
     <div class="card"><h3>Private by design</h3><ul><li>Secure sign-up and login</li><li>Stays signed in on reload</li><li>Shops can't see each other</li></ul></div>
     <div class="card"><h3>Works anywhere</h3><ul><li>Phone, tablet, desktop</li><li>Breakpoints at 480, 768, 1024</li></ul></div>
   </div>
-  <aside hidden>Six areas. Products, a sales ledger, custom channels, a dashboard, authentication, and a responsive layout. I'll show them live in a moment.</aside>
+  <aside hidden>Six areas. Products, a sales ledger, custom channels, a dashboard, authentication, and a responsive layout. The product tour follows.</aside>
 </section>
 
-<!-- 4 · Demo -->
-<section class="slide" data-seconds="75">
-  <div class="kicker">Live demo</div>
-  <h2>See it working</h2>
-  <div class="shots">
-    <figure class="shot"><img src="assets/login.png" alt="StockYard login screen"><figcaption>Sign in or create a shop</figcaption></figure>
-    <figure class="shot"><img src="assets/dashboard.png" alt="StockYard dashboard"><figcaption>Dashboard: revenue, units, profit, channel chart, low stock</figcaption></figure>
+<!-- 4 · Product tour -->
+<section class="slide" data-seconds="70" data-steps="4">
+  <div class="kicker">Product tour</div>
+  <h2>StockYard in action</h2>
+  <div class="walkgrid">
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>stockyard-ucr9.onrender.com</span></div>
+      <div class="viewport">
+        <img class="shotimg" data-s="1" src="assets/tour-dashboard.png" alt="Dashboard with revenue, profit and channel chart">
+        <img class="shotimg" data-s="2" src="assets/tour-products.png" alt="Product catalog with photos and low-stock flags">
+        <img class="shotimg" data-s="3" src="assets/tour-sales.png" alt="Sales page with the log-a-sale form and ledger">
+        <img class="shotimg phone" data-s="4" src="assets/tour-phone.png" alt="Dashboard on a phone-sized screen">
+      </div>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>The month at a glance</h3><p>Revenue, units and profit for the month, which channel earns the most, and what needs restocking.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>A catalog that stays honest</h3><p>Photo, cost, price and stock for every product. Low stock is flagged, and old products are archived, never deleted.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>Sales in seconds</h3><p>Pick a product and a channel, and stock drops automatically. The ledger filters by date and channel.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>Pocket-sized, too</h3><p>The same app on a phone: nothing spills off the screen, tables wrap, and the chart stays readable.</p></div>
+    </div>
   </div>
-  <aside hidden>SWITCH TO THE LIVE APP NOW (https://stockyard-ucr9.onrender.com). Tip: open it a minute before presenting so the free-tier server is awake. Walk through: 1) Create an account. 2) Add a product with a photo, cost 4, price 18, stock 10, threshold 3. 3) Go to Sales, log 8 units on Etsy. 4) Try to log 3 more and show the "Not enough stock" rejection. 5) Back to the Dashboard: revenue, profit, channel chart, and the low-stock list now show the product. 6) Shrink the browser to show the mobile layout.</aside>
+  <div class="livebar">Try it yourself: <a href="https://stockyard-ucr9.onrender.com" target="_blank" rel="noopener">stockyard-ucr9.onrender.com</a> <span>· create an account in seconds</span></div>
+  <aside hidden>This is the real application, running on Render with a managed PostgreSQL database. First the dashboard: the month's revenue, units and profit, a chart of which sales channel earns the most, and a restock list. Then the catalog, with photos, costs, prices and low-stock warnings. Then the sales page, where logging a sale lowers stock automatically and the ledger can be filtered by date and channel. Finally the same app on a phone-sized screen. You can try the live site yourself at the address on screen.</aside>
 </section>
 
 <!-- 5 · Architecture -->
@@ -200,7 +231,7 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
     <span class="pill">Java 21</span><span class="pill">Spring Boot 3.5</span><span class="pill">Spring Security + JWT</span>
     <span class="pill">DTO records</span><span class="pill">OpenAPI docs</span><span class="pill">Docker Compose</span><span class="pill">GitHub Actions CI</span>
   </div>
-  <aside hidden>The back end follows strict layers: controllers, services, repositories, DTOs. The schema is versioned with Flyway. In production the React build is bundled into the Spring Boot jar, so the whole app ships as a single Docker image alongside Postgres. Now let me walk through the code, following one request from the browser to the database. Press the right arrow to step through each highlight.</aside>
+  <aside hidden>The back end follows strict layers: controllers, services, repositories, DTOs. The schema is versioned with Flyway. In production the React build is bundled into the Spring Boot jar, so the whole app ships as a single Docker image alongside Postgres. Next, the code behind it, following one request from the browser to the database.</aside>
 </section>
 
 <!-- 6 · Walk: request -->
@@ -324,14 +355,14 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background:
 <section class="slide hero" data-seconds="25">
   <div class="brand" style="font-size:88px">Stock<b>Yard</b></div>
   <p>Next up: restock email alerts, CSV import, a public catalog page, and tags.</p>
-  <div class="meta">Thank you. Questions?<br>github.com/BDNIKKO/stockyard<br>Live: stockyard-ucr9.onrender.com<br>Nicholas Moppert · moppertn@gmail.com</div>
-  <aside hidden>Roadmap: email alerts for low stock, CSV import of historical sales, a public read-only catalog page, product tags, and hardened auth with refresh-token cookies. Thank you, I'm happy to take questions.</aside>
+  <div class="meta">Thanks for watching.<br>Live: stockyard-ucr9.onrender.com<br>github.com/BDNIKKO/stockyard<br>Nicholas Moppert · moppertn@gmail.com</div>
+  <aside hidden>Roadmap: email alerts for low stock, CSV import of historical sales, a public read-only catalog page, product tags, and hardened auth with refresh-token cookies. Thank you for watching, and please try the live site.</aside>
 </section>
 
 </div>
 <div id="notes"><h4>Speaker notes</h4><div id="notesText"></div></div>
 <div id="hud"></div>
-<div id="start">▶ Press any key to begin &nbsp;·&nbsp; <b>♪ music on</b> &nbsp;·&nbsp; M to mute</div>
+<div id="start">▶ Press any key to <b>play the presentation</b> &nbsp;·&nbsp; ♪ sound on &nbsp;·&nbsp; M to mute</div>
 
 <script>
 /* ============================ slides ============================ */
@@ -368,12 +399,13 @@ function render() {
     const cur = String(step);
     el.querySelectorAll('.ln[data-s]').forEach((l) => l.classList.toggle('on', l.dataset.s.split(' ').includes(cur)));
     el.querySelectorAll('.note').forEach((n) => n.classList.toggle('on', n.dataset.s === cur));
+    el.querySelectorAll('.shotimg').forEach((n) => n.classList.toggle('on', n.dataset.s === cur));
     el.querySelectorAll('.dots i').forEach((d, k) => d.classList.toggle('on', k + 1 === step));
   }
   bar.style.width = ((i + 1) / slides.length * 100) + '%';
   const a = el.querySelector('aside');
   notesText.textContent = a ? a.textContent : '';
-  hud.textContent = `${i + 1} / ${slides.length}  ·  ← → navigate · P auto-play${playing ? ' (on)' : ''} · M music${musicOn ? ' (on)' : ' (off)'} · N notes · F fullscreen`;
+  hud.textContent = `${i + 1} / ${slides.length}  ·  ← → navigate · P ${playing ? 'pause' : 'play'} · M music${musicOn ? ' (on)' : ' (off)'} · N notes · F fullscreen`;
   history.replaceState(null, '', '#' + (i + 1));
   if (playing) schedule();
 }
@@ -535,10 +567,12 @@ function firstInteraction(e) {
   if (started) return;
   started = true;
   document.getElementById('start').remove();
-  if (!(e.key && e.key.toLowerCase() === 'm')) startMusic();
+  const k = e.key ? e.key.toLowerCase() : '';
+  if (k !== 'm') startMusic();
+  if (k !== 'p' && !playing) togglePlay(true);      // a self-running presentation: starts playing on first interaction
 }
 addEventListener('keydown', (e) => {
-  firstInteraction(e);
+  if (!started) { e.preventDefault(); firstInteraction(e); return; }   // first key only starts playback
   const k = e.key.toLowerCase();
   if (['arrowright', 'pagedown', ' ', 'enter'].includes(k)) { e.preventDefault(); next(); }
   else if (['arrowleft', 'pageup', 'backspace'].includes(k)) { e.preventDefault(); prev(); }
@@ -550,8 +584,8 @@ addEventListener('keydown', (e) => {
   else if (k === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
 });
 addEventListener('click', (e) => {
-  firstInteraction(e);
-  if (e.target.closest('#notes')) return;
+  if (!started) { firstInteraction(e); return; }
+  if (e.target.closest('#notes') || e.target.closest('a')) return;
   e.clientX < innerWidth / 3 ? prev() : next();
 });
 addEventListener('resize', fit);
