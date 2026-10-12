@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StockYard · Capstone Presentation</title>
+<style>
+@font-face { font-family: 'Fraunces'; src: url('assets/fraunces.woff2') format('woff2'); font-weight: 100 900; }
+@font-face { font-family: 'DM Sans'; src: url('assets/dm-sans.woff2') format('woff2'); font-weight: 100 1000; }
+
+:root {
+  --bg: #f5ebe5; --surface: #fffdfb; --border: #e6d6cd; --text: #2e2a2c; --muted: #7b6f6c;
+  --sage: #5c7a66; --sage-dark: #476552; --sage-deep: #34503f; --sage-soft: #e6eee7;
+  --pink: #d9a3a0; --pink-soft: #f0d7d2; --orange: #d98a4e; --orange-light: #f2b077; --blue: #3b6a94;
+  --display: 'Fraunces', Georgia, serif; --sans: 'DM Sans', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #1d2a22; font-family: var(--sans); color: var(--text); overflow: hidden; }
+
+#stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center; }
+.slide {
+  position: absolute; inset: 0; padding: 56px 72px; background: var(--bg);
+  background-image: radial-gradient(900px 400px at 100% -10%, var(--pink-soft), transparent 60%);
+  opacity: 0; visibility: hidden; transform: translateX(24px); transition: opacity .45s, transform .45s, visibility .45s;
+  display: flex; flex-direction: column;
+}
+.slide.active { opacity: 1; visibility: visible; transform: none; }
+.slide.past { transform: translateX(-24px); }
+
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 42px; color: var(--sage-deep); margin-bottom: 8px; }
+.kicker { text-transform: uppercase; letter-spacing: .14em; font-size: 14px; font-weight: 700; color: var(--orange); margin-bottom: 10px; }
+.lead { font-size: 24px; color: var(--muted); margin: 0 0 28px; max-width: 900px; line-height: 1.4; }
+.brand { font-family: var(--display); font-weight: 700; color: var(--sage); }
+.brand b { color: var(--orange); }
+
+.hero {
+  background: radial-gradient(520px 320px at 90% 0%, rgba(242,176,119,.4), transparent 70%),
+              radial-gradient(420px 320px at 0% 100%, rgba(217,163,160,.35), transparent 70%),
+              linear-gradient(160deg, var(--sage), var(--sage-deep));
+  color: #fff; justify-content: center; padding: 64px 80px;
+}
+.hero .brand { color: #fff; font-size: 128px; line-height: 1; }
+.hero .brand b { color: var(--orange-light); }
+.hero p { font-family: var(--display); font-size: 32px; max-width: 760px; margin: 22px 0 36px; line-height: 1.3; }
+.hero .meta { font-size: 20px; opacity: .88; line-height: 1.7; }
+
+.cards { display: grid; gap: 22px; grid-template-columns: repeat(3, 1fr); }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-top: 5px solid var(--sage);
+  border-radius: 14px; padding: 24px 26px; box-shadow: 0 2px 4px rgba(94,60,50,.06), 0 10px 24px rgba(94,60,50,.08);
+}
+.card:nth-child(3n+1) { border-top-color: var(--pink); }
+.card:nth-child(3n+3) { border-top-color: var(--orange); }
+.card h3 { font-size: 24px; margin-bottom: 8px; color: var(--sage-deep); }
+.card p, .card li { font-size: 19px; line-height: 1.45; margin: 0; color: #4a4245; }
+.card ul { padding-left: 20px; margin: 0; }
+.big { font-family: var(--display); font-size: 54px; font-weight: 700; color: var(--orange); line-height: 1; margin-bottom: 8px; }
+
+.shots { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+.shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 8px rgba(40,55,45,.1), 0 20px 40px rgba(40,55,45,.18); background: #fff; }
+.shot img { width: 100%; height: auto; display: block; }
+.shot figcaption { padding: 10px 16px; font-size: 16px; color: var(--muted); background: var(--surface); }
+figure { margin: 0; }
+
+.arch { display: flex; align-items: stretch; gap: 14px; margin: 8px 0 24px; }
+.node { flex: 1; background: var(--surface); border: 2px solid var(--sage); border-radius: 14px; padding: 18px 16px; text-align: center; box-shadow: 0 6px 16px rgba(94,60,50,.1); }
+.node strong { display: block; font-family: var(--display); font-size: 22px; color: var(--sage-deep); margin-bottom: 6px; }
+.node span { font-size: 16px; color: var(--muted); line-height: 1.35; display: block; }
+.node.accent { border-color: var(--orange); }
+.arrow { align-self: center; font-size: 30px; color: var(--orange); }
+.bundle { border: 2px dashed var(--pink); border-radius: 18px; padding: 14px; display: flex; gap: 14px; align-items: stretch; flex: 4; position: relative; }
+.bundle::before { content: 'one Docker image'; position: absolute; top: -13px; left: 20px; background: var(--bg); padding: 0 10px; font-size: 14px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: .1em; }
+
+/* ---- code walkthrough slides ---- */
+.walkgrid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 26px; flex: 1; min-height: 0; margin-top: 6px; }
+.code {
+  background: #25302a; color: #e8efe9; border-radius: 14px; padding: 18px 8px 14px; overflow: hidden;
+  font: 14px/1.5 'Cascadia Code', Consolas, monospace; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.code .file { font-family: var(--sans); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--orange-light); font-weight: 700; padding: 0 18px 8px; }
+.ln { display: block; white-space: pre; padding: 0 18px 0 15px; border-left: 3px solid transparent; opacity: .36; transition: opacity .3s, background .3s, border-color .3s; }
+.ln.n { opacity: .55; }
+.ln.on { opacity: 1; background: rgba(242,176,119,.16); border-left-color: var(--orange); }
+.k { color: #f2b077; } .s { color: #a8cfae; } .c { color: #8aa393; font-style: italic; } .f { color: #9cc3e6; }
+.term { margin: 10px 14px 0; padding: 8px 12px; border-radius: 8px; background: #17201b; color: #8fd6a0; font-size: 13px; }
+
+.panel { position: relative; background: var(--surface); border: 1px solid var(--border); border-top: 5px solid var(--sage); border-radius: 14px; padding: 24px 26px; box-shadow: 0 2px 4px rgba(94,60,50,.06), 0 10px 24px rgba(94,60,50,.1); }
+.note { position: absolute; left: 26px; right: 26px; top: 24px; opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s; }
+.note.on { opacity: 1; transform: none; }
+.note .num { font-family: var(--display); font-size: 56px; font-weight: 700; color: var(--orange); line-height: 1; }
+.note h3 { font-size: 26px; color: var(--sage-deep); margin: 6px 0 10px; }
+.note p { font-size: 19px; line-height: 1.5; margin: 0; color: #4a4245; }
+.dots { position: absolute; left: 26px; bottom: 18px; display: flex; gap: 8px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background .3s, transform .3s; }
+.dots i.on { background: var(--orange); transform: scale(1.25); }
+
+.pill { display: inline-block; background: var(--sage-soft); color: var(--sage-deep); padding: 6px 14px; border-radius: 999px; font-size: 17px; font-weight: 600; margin: 0 8px 8px 0; }
+table.cmp { border-collapse: collapse; width: 100%; font-size: 19px; background: var(--surface); border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(94,60,50,.1); }
+.cmp th { background: var(--sage); color: #fff; text-align: left; padding: 12px 18px; font-family: var(--display); font-size: 20px; }
+.cmp td { padding: 12px 18px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.cmp tr:last-child td { border-bottom: 0; }
+.callout { margin-top: 22px; font-size: 22px; color: var(--sage-deep); font-weight: 600; }
+
+/* chrome */
+#bar { position: fixed; left: 0; top: 0; height: 5px; background: var(--orange); width: 0; transition: width .4s; z-index: 5; }
+#hud { position: fixed; right: 16px; bottom: 12px; color: #cdd9d0; font-size: 13px; z-index: 5; opacity: .75; }
+#start { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 7; background: rgba(20,30,24,.88); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 15px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+#start b { color: var(--orange-light); }
+#notes { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(20,30,24,.95); color: #eef3ef; padding: 16px 28px 20px; font-size: 17px; line-height: 1.5; z-index: 6; display: none; max-height: 34vh; overflow: auto; }
+#notes.on { display: block; }
+#notes h4 { margin: 0 0 6px; color: var(--orange-light); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  html, body { overflow: visible; height: auto; background: none; }
+  #stage { position: static; transform: none !important; width: auto; height: auto; }
+  .slide { position: relative; opacity: 1 !important; visibility: visible !important; transform: none !important; width: 1280px; height: 720px; page-break-after: always; break-after: page; }
+  .ln { opacity: 1 !important; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .note { position: static; opacity: 1 !important; transform: none; }
+  .note .num { display: inline; font-size: 22px; } .note h3 { display: inline; font-size: 18px; } .note p { font-size: 14px; }
+  .dots, #bar, #hud, #notes, #start { display: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (prefers-reduced-motion: reduce) { .slide, .ln, .note { transition: none; } }
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage">
+
+<!-- 1 · Title -->
+<section class="slide hero" data-seconds="30">
+  <div class="brand">Stock<b>Yard</b></div>
+  <p>Inventory and sales, made for makers who outgrew spreadsheets.</p>
+  <div class="meta">Nicholas Moppert<br>Software Engineering Capstone · Southern Careers Institute · Fall 2026<br>github.com/BDNIKKO/stockyard</div>
+  <aside hidden>Hi, I'm Nicholas, and this is StockYard, my capstone. In the next nine minutes I'll show you the problem it solves, the working app, the code behind it, and what I learned. Everything I show runs from the repository you can clone today.</aside>
+</section>
+
+<!-- 2 · Problem -->
+<section class="slide" data-seconds="35">
+  <div class="kicker">The problem</div>
+  <h2>Spreadsheets break. Enterprise tools overcharge.</h2>
+  <p class="lead">Solo makers selling on Etsy, at markets, and from their own sites hit a wall once inventory grows.</p>
+  <div class="cards">
+    <div class="card"><div class="big">1</div><h3>Counts drift</h3><p>Sell a mug at a craft fair and Etsy still shows it in stock. Someone has to fix it by hand.</p></div>
+    <div class="card"><div class="big">2</div><h3>Profit is a guess</h3><p>Revenue is easy to see. What each channel actually earns after cost of goods is not.</p></div>
+    <div class="card"><div class="big">$50</div><h3>Per month, for features they'll never touch</h3><p>The usual escape from the spreadsheet is a heavy platform built for businesses ten times the size.</p></div>
+  </div>
+  <aside hidden>The gap is real. A maker selling candles or prints has outgrown a spreadsheet but doesn't need a fifty-dollar-a-month enterprise platform. StockYard fills that gap: precise inventory, multi-channel sales, and one focused dashboard.</aside>
+</section>
+
+<!-- 3 · Solution -->
+<section class="slide" data-seconds="35">
+  <div class="kicker">The solution</div>
+  <h2>One place for stock, sales, and the numbers</h2>
+  <p class="lead">Every capability from the proposal's MVP shipped.</p>
+  <div class="cards">
+    <div class="card"><h3>Product catalog</h3><ul><li>SKU, photo, cost, price, stock</li><li>Edit any time</li><li>Archive without losing history</li></ul></div>
+    <div class="card"><h3>Sales ledger</h3><ul><li>Log product, channel, quantity, price</li><li>Stock drops automatically</li><li>Filter by date and channel</li></ul></div>
+    <div class="card"><h3>Your own channels</h3><ul><li>Etsy, markets, direct, pop-ups</li><li>Rename or add anytime</li><li>Starter set on sign-up</li></ul></div>
+    <div class="card"><h3>Dashboard</h3><ul><li>Month revenue, units, profit</li><li>Channel breakdown chart</li><li>Low-stock restock list</li></ul></div>
+    <div class="card"><h3>Private by design</h3><ul><li>Secure sign-up and login</li><li>Stays signed in on reload</li><li>Shops can't see each other</li></ul></div>
+    <div class="card"><h3>Works anywhere</h3><ul><li>Phone, tablet, desktop</li><li>Breakpoints at 480, 768, 1024</li></ul></div>
+  </div>
+  <aside hidden>Six areas. Products, a sales ledger, custom channels, a dashboard, authentication, and a responsive layout. I'll show them live in a moment.</aside>
+</section>
+
+<!-- 4 · Demo -->
+<section class="slide" data-seconds="75">
+  <div class="kicker">Live demo</div>
+  <h2>See it working</h2>
+  <div class="shots">
+    <figure class="shot"><img src="assets/login.png" alt="StockYard login screen"><figcaption>Sign in or create a shop</figcaption></figure>
+    <figure class="shot"><img src="assets/dashboard.png" alt="StockYard dashboard"><figcaption>Dashboard: revenue, units, profit, channel chart, low stock</figcaption></figure>
+  </div>
+  <aside hidden>SWITCH TO THE LIVE APP NOW (http://localhost:8080 or the hosted link). Walk through: 1) Create an account. 2) Add a product with a photo, cost 4, price 18, stock 10, threshold 3. 3) Go to Sales, log 8 units on Etsy. 4) Try to log 3 more and show the "Not enough stock" rejection. 5) Back to the Dashboard: revenue, profit, channel chart, and the low-stock list now show the product. 6) Shrink the browser to show the mobile layout.</aside>
+</section>
+
+<!-- 5 · Architecture -->
+<section class="slide" data-seconds="40">
+  <div class="kicker">Architecture</div>
+  <h2>Layered, simple to run</h2>
+  <p class="lead">A React single-page app talks JSON over HTTP to a layered Spring Boot API backed by PostgreSQL.</p>
+  <div class="arch">
+    <div class="bundle">
+      <div class="node"><strong>React 18 + Vite</strong><span>React Router, Axios interceptors, Recharts, CSS Modules</span></div>
+      <div class="arrow">⇄</div>
+      <div class="node"><strong>Controllers</strong><span>REST + validation</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>Services</strong><span>Business rules, transactions</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>Repositories</strong><span>Spring Data JPA</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="node accent"><strong>PostgreSQL 16</strong><span>Flyway-versioned schema</span></div>
+  </div>
+  <div>
+    <span class="pill">Java 21</span><span class="pill">Spring Boot 3.5</span><span class="pill">Spring Security + JWT</span>
+    <span class="pill">DTO records</span><span class="pill">OpenAPI docs</span><span class="pill">Docker Compose</span><span class="pill">GitHub Actions CI</span>
+  </div>
+  <aside hidden>The back end follows strict layers: controllers, services, repositories, DTOs. The schema is versioned with Flyway. In production the React build is bundled into the Spring Boot jar, so the whole app ships as a single Docker image alongside Postgres. Now let me walk through the code, following one request from the browser to the database. Press the right arrow to step through each highlight.</aside>
+</section>
+
+<!-- 6 · Walk: request -->
+<section class="slide" data-seconds="70" data-steps="4">
+  <div class="kicker">Code walkthrough · one request, end to end</div>
+  <h2>Logging a sale</h2>
+  <div class="walkgrid">
+    <div class="code"><div class="file">SaleController.java → SaleService.java (trimmed)</div>
+<span class="ln" data-s="1"><span class="k">@PostMapping</span></span><span class="ln" data-s="1"><span class="k">public</span> SaleResponse record(<span class="k">@AuthenticationPrincipal</span> MakerPrincipal me,</span><span class="ln" data-s="1">                           <span class="k">@Valid @RequestBody</span> SaleRequest req) {</span><span class="ln" data-s="1">    <span class="k">return</span> service.record(me.id(), req);</span><span class="ln" data-s="1">}</span><span class="ln n"> </span><span class="ln" data-s="2 3 4"><span class="k">@Transactional</span></span><span class="ln" data-s="2 3 4"><span class="k">public</span> SaleResponse record(Long makerId, SaleRequest req) {</span><span class="ln" data-s="2">    Product product = products.<span class="f">findByIdAndMakerId</span>(req.productId(), makerId)</span><span class="ln" data-s="2">        .orElseThrow(() -&gt; ApiException.notFound(<span class="s">"Product"</span>));</span><span class="ln" data-s="2">    <span class="c">// channels are looked up the same way</span></span><span class="ln n"> </span><span class="ln" data-s="3">    <span class="k">if</span> (products.<span class="f">decrementStock</span>(product.getId(), makerId, qty) == 0) {</span><span class="ln" data-s="3">        <span class="k">throw</span> ApiException.conflict(<span class="s">"Not enough stock for "</span> + sku);</span><span class="ln" data-s="3">    }</span><span class="ln n"> </span><span class="ln" data-s="4">    Sale sale = <span class="k">new</span> Sale(maker, product, channel, qty, price);</span><span class="ln" data-s="4">    <span class="c">// the Sale constructor copies today's unit cost</span></span><span class="ln" data-s="4">    <span class="k">return</span> SaleResponse.of(sales.save(sale));</span><span class="ln" data-s="2 3 4">}</span>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>The controller stays thin</h3><p>Spring Security hands it the signed-in maker, and <b>@Valid</b> rejects bad input before any business logic runs. Everything else is delegated.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>Ownership on every lookup</h3><p>Products and channels are fetched by id <b>and</b> maker. Someone else's product simply doesn't exist for you: a 404, never a data leak.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>One guarded statement decides</h3><p>The database lowers stock only if enough remains. Zero rows updated means the sale is refused with a 409. No read-then-write race.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>Ledger in the same transaction</h3><p>The sale copies the unit cost at that moment, then saves. <b>@Transactional</b> makes stock and ledger commit together, or not at all.</p></div>
+    </div>
+  </div>
+  <aside hidden>Follow one request. Step 1: the controller is thin. It gets the authenticated maker from the JWT and validates the body. Step 2: every lookup includes the maker id, so you can only touch your own data. Step 3: a single guarded UPDATE decides whether stock is available, which removes race conditions. Step 4: the sale is saved in the same transaction, with a snapshot of the unit cost so past profit never changes.</aside>
+</section>
+
+<!-- 7 · Walk: security -->
+<section class="slide" data-seconds="45" data-steps="4">
+  <div class="kicker">Code walkthrough · security</div>
+  <h2>Stateless JWT authentication</h2>
+  <div class="walkgrid">
+    <div class="code"><div class="file">SecurityConfig · JwtAuthFilter · JwtService (trimmed)</div>
+<span class="ln" data-s="1">.sessionManagement(s -&gt; s.sessionCreationPolicy(<span class="f">STATELESS</span>))</span><span class="ln" data-s="2">.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.<span class="k">class</span>)</span><span class="ln" data-s="3">.authorizeHttpRequests(a -&gt; a</span><span class="ln" data-s="3">    .requestMatchers(<span class="s">"/api/auth/register"</span>, <span class="s">"/api/auth/login"</span>).permitAll()</span><span class="ln" data-s="3">    .requestMatchers(<span class="s">"/api/**"</span>).<span class="f">authenticated</span>()</span><span class="ln" data-s="3">    .anyRequest().permitAll())</span><span class="ln n"> </span><span class="ln" data-s="2"><span class="c">// JwtAuthFilter</span></span><span class="ln" data-s="2">String header = request.getHeader(HttpHeaders.AUTHORIZATION);</span><span class="ln" data-s="2"><span class="k">if</span> (header != <span class="k">null</span> &amp;&amp; header.startsWith(<span class="s">"Bearer "</span>)) {</span><span class="ln" data-s="2">    jwt.<span class="f">parse</span>(header.substring(7)).ifPresent(principal -&gt;</span><span class="ln" data-s="2">        SecurityContextHolder.getContext().setAuthentication(auth));</span><span class="ln" data-s="2">}</span><span class="ln n"> </span><span class="ln" data-s="4"><span class="c">// JwtService</span></span><span class="ln" data-s="4">Jwts.builder().subject(String.valueOf(makerId))</span><span class="ln" data-s="4">    .claim(<span class="s">"email"</span>, email)</span><span class="ln" data-s="4">    .expiration(Date.from(now.plus(ttl)))</span><span class="ln" data-s="4">    .<span class="f">signWith</span>(key).compact();</span>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>No server sessions</h3><p>Nothing is remembered on the server between requests. Each request carries its own proof of identity, so the API scales and restarts cleanly.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>A filter checks every call</h3><p>It reads the Bearer token, verifies the signature and expiry, and puts the signed-in maker into the security context.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>Locked by default</h3><p>Only sign-up and login are open. Every other <b>/api</b> route requires a valid token; everything else is just the React app.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>Signed, expiring tokens</h3><p>Tokens carry the maker id and an expiry, signed with a secret from the environment. Passwords are stored only as BCrypt hashes.</p></div>
+    </div>
+  </div>
+  <aside hidden>Security is stateless. A filter validates the JWT on each request. Only register and login are public; every other API route needs a token. Tokens are signed with a secret that comes from an environment variable, and passwords are stored as BCrypt hashes.</aside>
+</section>
+
+<!-- 8 · Walk: database -->
+<section class="slide" data-seconds="45" data-steps="4">
+  <div class="kicker">Code walkthrough · database</div>
+  <h2>A schema that protects itself</h2>
+  <div class="walkgrid">
+    <div class="code"><div class="file">V1__init.sql · Flyway migration (excerpt)</div>
+<span class="ln n"><span class="k">CREATE TABLE</span> sales (</span><span class="ln" data-s="1">    id BIGINT <span class="k">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,</span><span class="ln" data-s="1">    maker_id   BIGINT <span class="k">NOT NULL REFERENCES</span> makers(id) <span class="k">ON DELETE CASCADE</span>,</span><span class="ln" data-s="1">    product_id BIGINT <span class="k">NOT NULL REFERENCES</span> products(id),</span><span class="ln" data-s="1">    channel_id BIGINT <span class="k">NOT NULL REFERENCES</span> channels(id),</span><span class="ln" data-s="2">    quantity   INTEGER <span class="k">NOT NULL CHECK</span> (quantity &gt; 0),</span><span class="ln" data-s="2">    unit_price NUMERIC(12,2) <span class="k">NOT NULL CHECK</span> (unit_price &gt;= 0),</span><span class="ln" data-s="3">    unit_cost  NUMERIC(12,2) <span class="k">NOT NULL CHECK</span> (unit_cost &gt;= 0),</span><span class="ln n">    sold_at TIMESTAMP WITH TIME ZONE <span class="k">NOT NULL</span> ...</span><span class="ln n">);</span><span class="ln n"> </span><span class="ln" data-s="4"><span class="k">CREATE INDEX</span> idx_sales_maker_date <span class="k">ON</span> sales(maker_id, sold_at);</span><span class="ln n"> </span><span class="ln" data-s="2"><span class="c">-- products table</span></span><span class="ln" data-s="2">stock INTEGER <span class="k">NOT NULL CHECK</span> (stock &gt;= 0),</span><span class="ln" data-s="2"><span class="k">CONSTRAINT</span> uq_products_maker_sku <span class="k">UNIQUE</span> (maker_id, sku)</span>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>Normalized and linked</h3><p>Each sale points to its maker, product and channel with foreign keys. No duplicated names, no orphan rows.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>Rules live in the database</h3><p>No negative stock or prices, quantity above zero, one SKU per maker. Even a bug in the app can't write bad data.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>Cost is snapshotted</h3><p>Each sale stores the cost at the time. Edit a product's cost later and last month's profit stays correct.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>Indexed for the questions we ask</h3><p>Maker plus date range is exactly how the dashboard and ledger filter. Flyway applies this same schema in every environment.</p></div>
+    </div>
+  </div>
+  <aside hidden>The database enforces the rules. Foreign keys keep data normalized, CHECK constraints prevent invalid values, and a unique constraint keeps SKUs unique per shop. The sales table snapshots unit cost so history never changes. An index on maker and date matches the dashboard and ledger queries, and Flyway applies the identical schema everywhere.</aside>
+</section>
+
+<!-- 9 · Walk: frontend -->
+<section class="slide" data-seconds="45" data-steps="4">
+  <div class="kicker">Code walkthrough · front end</div>
+  <h2>From API to a responsive chart</h2>
+  <div class="walkgrid">
+    <div class="code"><div class="file">Dashboard.jsx · Dashboard.module.css · tokens.css</div>
+<span class="ln" data-s="1"><span class="f">useEffect</span>(() =&gt; {</span><span class="ln" data-s="1">  api.get(<span class="s">'/api/dashboard'</span>).then((r) =&gt; setData(r.data))</span><span class="ln" data-s="1">     .catch((e) =&gt; setError(describeError(e).message));</span><span class="ln" data-s="1">}, []);</span><span class="ln n"> </span><span class="ln" data-s="2"><span class="k">const</span> chartData = data.channels.map((c) =&gt; ({</span><span class="ln" data-s="2">  name: c.channelName, Revenue: Number(c.revenue),</span><span class="ln" data-s="2">  Profit: Number(c.revenue) - Number(c.cost),</span><span class="ln" data-s="2">}));</span><span class="ln n"> </span><span class="ln" data-s="3">&lt;<span class="f">ResponsiveContainer</span> width=<span class="s">"100%"</span> height=<span class="s">"100%"</span>&gt;</span><span class="ln" data-s="3">  &lt;<span class="f">BarChart</span> data={chartData}&gt;</span><span class="ln" data-s="3">    &lt;<span class="f">Bar</span> dataKey=<span class="s">"Revenue"</span> fill=<span class="s">"#6f9a7c"</span> /&gt;</span><span class="ln" data-s="3">    &lt;<span class="f">Bar</span> dataKey=<span class="s">"Profit"</span>  fill=<span class="s">"#d98a4e"</span> /&gt;</span><span class="ln n"> </span><span class="ln" data-s="4">.chart { height: 240px; }</span><span class="ln" data-s="4"><span class="k">@media</span> (min-width: 480px) { .chart { height: 280px; } }</span><span class="ln" data-s="4"><span class="k">@media</span> (min-width: 768px) { .chart { height: 320px; } }</span><span class="ln" data-s="4"><span class="c">/* tokens.css */</span> --color-sage: #5c7a66; --color-orange: #d98a4e;</span>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>One shared API client</h3><p>The page just calls the API. An Axios interceptor already attached the token and handles expired sessions in one place.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>Shape data for the chart</h3><p>The server sends totals; the page derives profit per channel and hands Recharts a simple list.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>Charts that resize</h3><p>The chart fills a container whose height changes by breakpoint, so it never clips on a phone.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>Tokens, not a UI library</h3><p>CSS Modules over shared design tokens. The whole green-and-orange re-theme was a handful of variables.</p></div>
+    </div>
+  </div>
+  <aside hidden>On the front end, pages are thin. A shared Axios client handles authentication. The dashboard reshapes the totals into chart data, Recharts renders it inside a responsive container, and CSS Modules with design tokens control the look at the 480, 768 and 1024 pixel breakpoints, with no third-party component library.</aside>
+</section>
+
+<!-- 10 · Walk: tests -->
+<section class="slide" data-seconds="40" data-steps="5">
+  <div class="kicker">Code walkthrough · proof</div>
+  <h2>Tests that try to break it</h2>
+  <div class="walkgrid">
+    <div class="code"><div class="file">SalesFlowTest.java (simplified)</div>
+<span class="ln" data-s="1"><span class="c">// 10 in stock. Sell 8.</span></span><span class="ln" data-s="1">send(post(<span class="s">"/api/sales"</span>), token, sale(productId, channelId, <span class="f">8</span>), <span class="f">201</span>);</span><span class="ln n"> </span><span class="ln" data-s="2"><span class="c">// Only 2 left. Selling 3 must fail.</span></span><span class="ln" data-s="2">send(post(<span class="s">"/api/sales"</span>), token, sale(productId, channelId, <span class="f">3</span>), <span class="f">409</span>);</span><span class="ln n"> </span><span class="ln" data-s="3">assertThat(product.get(<span class="s">"stock"</span>).asInt()).isEqualTo(<span class="f">2</span>);</span><span class="ln" data-s="3">assertThat(send(get(<span class="s">"/api/sales"</span>), token, <span class="k">null</span>, 200)).hasSize(<span class="f">1</span>);</span><span class="ln n"> </span><span class="ln" data-s="4">assertThat(dash.get(<span class="s">"revenue"</span>)).isEqualByComparingTo(<span class="s">"144.00"</span>);</span><span class="ln" data-s="4">assertThat(dash.get(<span class="s">"profit"</span>)).isEqualByComparingTo(<span class="s">"112.00"</span>);</span><span class="ln n"> </span><span class="ln" data-s="5"><span class="c">// Another shop tries to sell this product</span></span><span class="ln" data-s="5">send(post(<span class="s">"/api/sales"</span>), otherMaker, sale(productId, theirChannel, 1), <span class="f">404</span>);</span><div class="term">Tests run: 3, Failures: 0, Errors: 0 &nbsp;·&nbsp; BUILD SUCCESS</div>
+    </div>
+    <div class="panel">
+      <div class="note" data-s="1"><div class="num">1</div><h3>A normal sale works</h3><p>Ten units in stock, eight sold: the request succeeds with a 201.</p></div>
+      <div class="note" data-s="2"><div class="num">2</div><h3>Overselling is refused</h3><p>Asking for three when two remain returns a 409 Conflict.</p></div>
+      <div class="note" data-s="3"><div class="num">3</div><h3>And nothing changed</h3><p>Stock is still two and the ledger still has one entry. A failed sale leaves no trace.</p></div>
+      <div class="note" data-s="4"><div class="num">4</div><h3>The math is right</h3><p>8 sold at $18 is $144 revenue; with a $4 cost, $112 profit. The dashboard matches to the cent.</p></div>
+      <div class="note" data-s="5"><div class="num">5</div><h3>Shops stay separate</h3><p>A second maker can't sell the first maker's product: 404. Isolation is tested, not assumed.</p></div>
+    </div>
+  </div>
+  <aside hidden>The integration tests boot the full app with the real migrations. They prove a sale works, that overselling is refused and leaves no trace, that the dashboard math is exact, and that one maker cannot touch another maker's data. All three tests pass on every build, and CI runs them on each push.</aside>
+</section>
+
+<!-- 11 · Delivery -->
+<section class="slide" data-seconds="35">
+  <div class="kicker">Quality and delivery</div>
+  <h2>Containerized, automated, one command to run</h2>
+  <div class="cards">
+    <div class="card"><h3>Automated checks</h3><ul><li>Backend tests with Maven</li><li>Front-end production build</li><li>GitHub Actions on every push</li></ul></div>
+    <div class="card"><h3>Anyone can run it</h3><ul><li><b>docker compose up --build</b></li><li>Open localhost:8080</li><li>Postgres included</li></ul></div>
+    <div class="card"><h3>Ready to host</h3><ul><li>Single Docker image</li><li>Render blueprint in the repo</li><li>Secrets from environment</li></ul></div>
+  </div>
+  <aside hidden>Setup for a reviewer is one command. The repo also has a Render blueprint for a hosted copy, and CI builds and tests on every push.</aside>
+</section>
+
+<!-- 12 · Reflection -->
+<section class="slide" data-seconds="45">
+  <div class="kicker">Reflection</div>
+  <h2>What changed, and what I learned</h2>
+  <table class="cmp">
+    <tr><th style="width:26%">Proposal</th><th style="width:34%">What I shipped</th><th>Why</th></tr>
+    <tr><td>Azure App Service + Static Web Apps</td><td>One Docker image, Render blueprint</td><td>Anyone can run or view it without cloud credentials</td></tr>
+    <tr><td>Caching layer for reads</td><td>Aggregates computed in PostgreSQL</td><td>Fast enough at this scale; less to maintain</td></tr>
+    <tr><td>Azure Blob image storage</td><td>Local disk behind a storage class</td><td>Simple now; one class to swap later</td></tr>
+  </table>
+  <p class="callout">Lesson: push consistency into the database, ship the simplest architecture that works, and keep the docs honest about what's real.</p>
+  <aside hidden>Three deliberate deviations. I simplified hosting to a single container so a reviewer can run it with one command, I skipped a separate cache because the aggregate queries are fast, and images stay on local disk behind one class that's ready for object storage. The biggest lesson: let the database enforce consistency, and describe the system as it actually is.</aside>
+</section>
+
+<!-- 13 · Close -->
+<section class="slide hero" data-seconds="25">
+  <div class="brand" style="font-size:88px">Stock<b>Yard</b></div>
+  <p>Next up: restock email alerts, CSV import, a public catalog page, and tags.</p>
+  <div class="meta">Thank you. Questions?<br>github.com/BDNIKKO/stockyard<br>Nicholas Moppert · moppertn@gmail.com</div>
+  <aside hidden>Roadmap: email alerts for low stock, CSV import of historical sales, a public read-only catalog page, product tags, and hardened auth with refresh-token cookies. Thank you, I'm happy to take questions.</aside>
+</section>
+
+</div>
+<div id="notes"><h4>Speaker notes</h4><div id="notesText"></div></div>
+<div id="hud"></div>
+<div id="start">▶ Press any key to begin &nbsp;·&nbsp; <b>♪ music on</b> &nbsp;·&nbsp; M to mute</div>
+
+<script>
+/* ============================ slides ============================ */
+const slides = [...document.querySelectorAll('.slide')];
+const stage = document.getElementById('stage');
+const bar = document.getElementById('bar');
+const hud = document.getElementById('hud');
+const notes = document.getElementById('notes');
+const notesText = document.getElementById('notesText');
+let i = 0, step = 1, timer = null, playing = false;
+const stepsOf = (el) => +el.dataset.steps || 1;
+
+slides.forEach((el) => {            // step dots
+  const n = stepsOf(el);
+  if (n > 1) {
+    const d = document.createElement('div');
+    d.className = 'dots';
+    d.innerHTML = '<i></i>'.repeat(n);
+    el.querySelector('.panel').appendChild(d);
+  }
+});
+
+function fit() {
+  const s = Math.min(innerWidth / 1280, innerHeight / 720);
+  stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+}
+function render() {
+  slides.forEach((el, k) => {
+    el.classList.toggle('active', k === i);
+    el.classList.toggle('past', k < i);
+  });
+  const el = slides[i];
+  if (stepsOf(el) > 1) {
+    const cur = String(step);
+    el.querySelectorAll('.ln[data-s]').forEach((l) => l.classList.toggle('on', l.dataset.s.split(' ').includes(cur)));
+    el.querySelectorAll('.note').forEach((n) => n.classList.toggle('on', n.dataset.s === cur));
+    el.querySelectorAll('.dots i').forEach((d, k) => d.classList.toggle('on', k + 1 === step));
+  }
+  bar.style.width = ((i + 1) / slides.length * 100) + '%';
+  const a = el.querySelector('aside');
+  notesText.textContent = a ? a.textContent : '';
+  hud.textContent = `${i + 1} / ${slides.length}  ·  ← → navigate · P auto-play${playing ? ' (on)' : ''} · M music${musicOn ? ' (on)' : ' (off)'} · N notes · F fullscreen`;
+  history.replaceState(null, '', '#' + (i + 1));
+  if (playing) schedule();
+}
+function go(n, atEnd) {
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  step = atEnd ? stepsOf(slides[i]) : 1;
+  render();
+}
+function next() { if (step < stepsOf(slides[i])) { step++; render(); } else if (i < slides.length - 1) go(i + 1); }
+function prev() { if (step > 1) { step--; render(); } else if (i > 0) go(i - 1, true); }
+
+function schedule() {
+  clearTimeout(timer);
+  const secs = (+slides[i].dataset.seconds || 30) / stepsOf(slides[i]);
+  timer = setTimeout(() => {
+    const last = i === slides.length - 1 && step === stepsOf(slides[i]);
+    if (last) togglePlay(false); else next();
+  }, secs * 1000);
+}
+function togglePlay(force) {
+  playing = force ?? !playing;
+  clearTimeout(timer);
+  render();
+}
+
+/* ============================ music ============================ */
+let musicOn = false, musicEl = null, actx = null, master = null, bus = null, air = null, genStarted = false, nextT = 0, barIdx = 0;
+
+function startMusic() {
+  musicOn = true;
+  if (genStarted) { actx.resume(); fadeGen(0.5); return; }
+  if (!musicEl) {
+    musicEl = new Audio('assets/music.mp3');       // drop your own file here to override the generated score
+    musicEl.loop = true; musicEl.volume = 0.4;
+    musicEl.addEventListener('error', () => { musicEl = null; if (musicOn) startGenerative(); }, { once: true });
+  }
+  musicEl.play().catch(() => { if (musicEl && musicEl.error) { musicEl = null; startGenerative(); } });
+}
+function stopMusic() {
+  musicOn = false;
+  if (musicEl) musicEl.pause();
+  if (genStarted) fadeGen(0);
+}
+function toggleMusic() { musicOn ? stopMusic() : startMusic(); render(); }
+function fadeGen(v) { master.gain.cancelScheduledValues(actx.currentTime); master.gain.setTargetAtTime(v, actx.currentTime, 0.6); }
+
+/* Generated score: D minor, Dm - Bb - Gm - A, slow pads, deep bass, timpani, sparse melody. */
+const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+const BAR = 8;
+const PROG = [
+  { bass: 38, pad: [50, 57, 62, 65] },   // Dm
+  { bass: 34, pad: [50, 58, 62, 65] },   // Bb
+  { bass: 43, pad: [50, 55, 58, 62] },   // Gm
+  { bass: 45, pad: [49, 52, 57, 61] },   // A
+];
+const MELODY = [62, 65, 67, 69, 72, 74, 69, 65];
+
+function startGenerative() {
+  genStarted = true;
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  master = actx.createGain(); master.gain.value = 0;
+  const comp = actx.createDynamicsCompressor();
+  const verb = actx.createConvolver(); verb.buffer = impulse(5, 2.6);
+  const wet = actx.createGain(); wet.gain.value = 0.7;
+  const dry = actx.createGain(); dry.gain.value = 0.6;
+  bus = actx.createGain();
+  bus.connect(dry); bus.connect(verb); verb.connect(wet);
+  dry.connect(comp); wet.connect(comp); comp.connect(master); master.connect(actx.destination);
+  // "air" bus for the piccolo voice: goes to the mix, plus a soft feedback echo for light trails
+  air = actx.createGain();
+  const dly = actx.createDelay(1.5); dly.delayTime.value = 0.42;
+  const fb = actx.createGain(); fb.gain.value = 0.38;
+  const echo = actx.createBiquadFilter(); echo.type = 'lowpass'; echo.frequency.value = 3200;
+  air.connect(bus); air.connect(dly); dly.connect(echo); echo.connect(fb); fb.connect(dly); echo.connect(verb); echo.connect(dry);
+  master.gain.linearRampToValueAtTime(0.5, actx.currentTime + 5);
+  nextT = actx.currentTime + 0.3;
+  scheduleBars();
+}
+function impulse(sec, decay) {
+  const rate = actx.sampleRate, len = Math.floor(rate * sec), buf = actx.createBuffer(2, len, rate);
+  for (let c = 0; c < 2; c++) {
+    const d = buf.getChannelData(c);
+    for (let k = 0; k < len; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / len, decay);
+  }
+  return buf;
+}
+function tone(type, f, t0, att, dur, rel, vol, lp, det = 0) {
+  const o = actx.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = det;
+  const g = actx.createGain();
+  g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + att);
+  g.gain.setValueAtTime(vol, t0 + dur); g.gain.linearRampToValueAtTime(0, t0 + dur + rel);
+  if (lp) { const fl = actx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; fl.Q.value = 0.6; o.connect(fl); fl.connect(g); }
+  else o.connect(g);
+  g.connect(bus); o.start(t0); o.stop(t0 + dur + rel + 0.1);
+}
+function timpani(t, vol) {
+  const o = actx.createOscillator(); o.type = 'sine';
+  o.frequency.setValueAtTime(125, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.4);
+  const g = actx.createGain();
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+  o.connect(g); g.connect(bus); o.start(t); o.stop(t + 2.5);
+}
+/* Piccolo-style voice: pure tone with a hint of breath, light vibrato, short and airy. */
+function piccolo(f, t0, dur, vol) {
+  const o = actx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+  const o2 = actx.createOscillator(); o2.type = 'triangle'; o2.frequency.value = f;
+  const lfo = actx.createOscillator(); lfo.frequency.value = 5.6;
+  const lg = actx.createGain(); lg.gain.value = f * 0.004;
+  lfo.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+  const g2 = actx.createGain(); g2.gain.value = 0.22;
+  const g = actx.createGain();
+  g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + 0.025);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  const hp = actx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
+  o.connect(g); o2.connect(g2); g2.connect(g); g.connect(hp); hp.connect(air);
+  [o, o2, lfo].forEach((n) => { n.start(t0); n.stop(t0 + dur + 0.05); });
+}
+function flourish(ch, t) {
+  const tones = [...ch.pad.map((n) => n + 24), ...ch.pad.map((n) => n + 36)].sort((a, b) => a - b);
+  const top = tones[tones.length - 1 - Math.floor(Math.random() * 3)];           // landing note
+  const idx = tones.indexOf(top);
+  const runLen = 3 + Math.floor(Math.random() * 3);
+  let at = t;
+  for (let k = runLen; k >= 1; k--) {                                              // quick rising run
+    const n = tones[Math.max(0, idx - k)];
+    piccolo(mtof(n), at, 0.5, 0.02 + (runLen - k) * 0.004);
+    at += 0.1;
+  }
+  const lower = tones[Math.max(0, idx - 1)];                                       // then a soft trill that fades
+  const trillLen = 10 + Math.floor(Math.random() * 6);
+  for (let k = 0; k < trillLen; k++) {
+    piccolo(mtof(k % 2 ? lower : top), at, 0.4, Math.max(0.006, 0.034 - k * 0.0022));
+    at += 0.085;
+  }
+}
+function playBar(ch, t) {
+  if (Math.random() < 0.8) flourish(ch, t + 2.4);
+  if (Math.random() < 0.55) flourish(ch, t + 5.6);
+  tone('triangle', mtof(ch.bass), t, 1.5, BAR - 0.5, 2.5, 0.34, 320);
+  tone('sine', mtof(ch.bass - 12), t, 1.5, BAR - 0.5, 2.5, 0.22);
+  ch.pad.forEach((n) => {
+    tone('sawtooth', mtof(n), t, 2.6, BAR - 0.8, 3.2, 0.03, 620, -7);
+    tone('sawtooth', mtof(n), t, 2.6, BAR - 0.8, 3.2, 0.03, 620, 7);
+  });
+  timpani(t, 0.7);
+  if (barIdx % 2 === 1) timpani(t + 4, 0.38);
+  [1.6, 3.6, 5.6].forEach((o) => {
+    if (Math.random() < 0.8) tone('triangle', mtof(MELODY[Math.floor(Math.random() * MELODY.length)]), t + o, 0.02, 0.3, 2.8, 0.1, 2400);
+  });
+}
+function scheduleBars() {
+  while (nextT < actx.currentTime + 14) { playBar(PROG[barIdx % PROG.length], nextT); nextT += BAR; barIdx++; }
+  setTimeout(scheduleBars, 3000);
+}
+
+/* ============================ input ============================ */
+let started = false;
+function firstInteraction(e) {
+  if (started) return;
+  started = true;
+  document.getElementById('start').remove();
+  if (!(e.key && e.key.toLowerCase() === 'm')) startMusic();
+}
+addEventListener('keydown', (e) => {
+  firstInteraction(e);
+  const k = e.key.toLowerCase();
+  if (['arrowright', 'pagedown', ' ', 'enter'].includes(k)) { e.preventDefault(); next(); }
+  else if (['arrowleft', 'pageup', 'backspace'].includes(k)) { e.preventDefault(); prev(); }
+  else if (k === 'home') go(0);
+  else if (k === 'end') go(slides.length - 1);
+  else if (k === 'p') togglePlay();
+  else if (k === 'm') toggleMusic();
+  else if (k === 'n') notes.classList.toggle('on');
+  else if (k === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+});
+addEventListener('click', (e) => {
+  firstInteraction(e);
+  if (e.target.closest('#notes')) return;
+  e.clientX < innerWidth / 3 ? prev() : next();
+});
+addEventListener('resize', fit);
+fit();
+const [h1, h2] = location.hash.slice(1).split('.');   // e.g. #6.3 = slide 6, step 3
+go((parseInt(h1) || 1) - 1);
+if (h2) { step = Math.min(parseInt(h2) || 1, stepsOf(slides[i])); render(); }
+</script>
+</body>
+</html>

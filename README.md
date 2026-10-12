@@ -42,6 +42,20 @@ The repo includes a `render.yaml`, so you can host a live copy for free on [Rend
 
 The free tier naps when nobody is using it, so the first visit can take about 30 seconds to wake up. The free database also expires after 30 days, and uploaded photos reset when the app is redeployed.
 
+## Capstone presentation
+
+A self-playing slide deck lives in [`docs/presentation/`](docs/presentation/). Open `index.html` in any browser (no install, works offline) and press any key to begin.
+
+| Key | Action |
+|---|---|
+| `→` / `←` | Next / previous step (code slides highlight line by line) |
+| `P` | Auto-play the whole talk (about 9½ minutes) |
+| `M` | Mute or unmute the background score |
+| `N` | Show speaker notes, including the live-demo script |
+| `F` | Fullscreen |
+
+Prefer a static copy? [`StockYard_Slides.pdf`](docs/presentation/StockYard_Slides.pdf) has every slide. To use your own background track instead of the built-in generated score, drop an `assets/music.mp3` next to `index.html`.
+
 ---
 
 ## Technical overview
@@ -88,6 +102,21 @@ Interactive docs are served at `/swagger-ui.html` (OpenAPI JSON at `/v3/api-docs
 | Channels | `GET/POST /api/channels`, `PUT/DELETE /api/channels/{id}` |
 | Sales | `GET /api/sales?from=&to=&channelId=`, `POST /api/sales` |
 | Dashboard | `GET /api/dashboard` |
+
+### Project layout
+
+```
+stockyard/
+├── backend/            Spring Boot API (Java 21, Maven)
+│   └── src/main/java/com/stockyard/   auth · product · channel · sale · dashboard · security · common
+│   └── src/main/resources/db/migration/   Flyway SQL migrations
+├── frontend/           React 18 + Vite app (pages, components, CSS Modules, design tokens)
+├── docs/presentation/  Capstone slide deck (HTML + PDF)
+├── Dockerfile          Builds the React app and API into one image
+├── docker-compose.yml  App + PostgreSQL for one-command local runs
+├── render.yaml         Render blueprint for a hosted copy
+└── .github/workflows/  CI: backend tests + front-end build
+```
 
 ### Run for development (hot reload)
 
