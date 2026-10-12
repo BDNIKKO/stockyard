@@ -36,11 +36,13 @@ Wait a few minutes the first time, then open **http://localhost:8080**.
 
 To stop it, press `Ctrl+C`. To stop it and erase all the data, run `docker compose down -v`.
 
-## Put it online
+## Live demo
 
-The repo includes a `render.yaml`, so you can host a live copy for free on [Render](https://render.com): choose **New → Blueprint**, pick this repository, and click apply. Render builds the app, creates the database and gives you a web address.
+**[LIVE URL: paste your Render address here after deploying]**
 
-The free tier naps when nobody is using it, so the first visit can take about 30 seconds to wake up. The free database also expires after 30 days, and uploaded photos reset when the app is redeployed.
+The hosted copy runs the same Docker image as the one above, on [Render](https://render.com) with a managed PostgreSQL database. It sleeps when nobody is using it, so the first visit can take about 30 seconds to wake up. Create your own account to try it; each account is private.
+
+Want to host your own copy? The repo includes a Render blueprint and a step-by-step [deployment guide](docs/DEPLOYMENT.md). It takes about ten minutes and costs nothing.
 
 ## Capstone presentation
 
