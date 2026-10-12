@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import api, { describeError } from '../api.js';
 import Field from '../components/Field.jsx';
+import { useToast } from '../components/Toast.jsx';
 import { formatDate, formatMoney } from '../format.js';
 import ui from '../styles/ui.module.css';
 
@@ -12,6 +13,7 @@ export default function Sales() {
   const [form, setForm] = useState({ productId: '', channelId: '', quantity: '1', unitPrice: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
 
   const loadSales = useCallback(() => {
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
@@ -44,6 +46,8 @@ export default function Sales() {
         quantity: Number(form.quantity),
         unitPrice: form.unitPrice === '' ? null : Number(form.unitPrice),
       });
+      const chName = channels.find((c) => String(c.id) === form.channelId)?.name;
+      toast(`Sale recorded: ${form.quantity} x ${selected?.title ?? 'item'}${chName ? ` on ${chName}` : ''}`);
       setForm({ ...form, quantity: '1' });
       loadSales();
       loadProducts();

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import api, { describeError } from '../api.js';
 import Field from '../components/Field.jsx';
+import { useToast } from '../components/Toast.jsx';
 import { formatMoney } from '../format.js';
 import ui from '../styles/ui.module.css';
 import styles from './Products.module.css';
@@ -12,6 +13,7 @@ export default function Products() {
   const [showArchived, setShowArchived] = useState(false);
   const [editing, setEditing] = useState(null); // null | 'new' | product
   const [error, setError] = useState('');
+  const toast = useToast();
 
   const load = useCallback(() => {
     api.get('/api/products', { params: { archived: showArchived } })
@@ -24,6 +26,7 @@ export default function Products() {
   async function toggleArchive(p) {
     try {
       await api.post(`/api/products/${p.id}/${p.archived ? 'restore' : 'archive'}`);
+      toast(p.archived ? `${p.title} restored` : `${p.title} archived`);
       load();
     } catch (e) {
       setError(describeError(e).message);
@@ -47,14 +50,20 @@ export default function Products() {
         <ProductForm
           product={editing === 'new' ? null : editing}
           onCancel={() => setEditing(null)}
-          onSaved={() => { setEditing(null); load(); }}
+          onSaved={(saved) => { setEditing(null); toast(`${saved} saved`); load(); }}
         />
       )}
 
       <div className={styles.grid}>
-        {products.length === 0 && <p className={ui.muted}>No {showArchived ? 'archived' : ''} products.</p>}
-        {products.map((p) => (
-          <article key={p.id} className={styles.item}>
+        {products.length === 0 && (
+          <div className={ui.empty} style={{ gridColumn: '1 / -1' }}>
+            <div className={ui.emptyIcon}>🧺</div>
+            <p>No {showArchived ? 'archived ' : ''}products yet.</p>
+            {!showArchived && <span className={ui.muted}>Add your first product to start tracking stock.</span>}
+          </div>
+        )}
+        {products.map((p, idx) => (
+          <article key={p.id} className={styles.item} style={{ animationDelay: `${Math.min(idx, 8) * 55}ms` }}>
             <div className={styles.thumb}>
               {p.imageUrl ? <img src={p.imageUrl} alt={p.title} /> : <span>No image</span>}
             </div>
@@ -110,7 +119,7 @@ function ProductForm({ product, onCancel, onSaved }) {
         data.append('file', file);
         await api.post(`/api/products/${res.data.id}/image`, data);
       }
-      onSaved();
+      onSaved(res.data.title);
     } catch (err) {
       const d = describeError(err);
       setError(d.message);
