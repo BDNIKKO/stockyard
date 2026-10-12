@@ -38,9 +38,9 @@ To stop it, press `Ctrl+C`. To stop it and erase all the data, run `docker compo
 
 ## Live demo
 
-**[LIVE URL: paste your Render address here after deploying]**
+**[https://stockyard-ucr9.onrender.com](https://stockyard-ucr9.onrender.com)**
 
-The hosted copy runs the same Docker image as the one above, on [Render](https://render.com) with a managed PostgreSQL database. It sleeps when nobody is using it, so the first visit can take about 30 seconds to wake up. Create your own account to try it; each account is private.
+The hosted copy runs the same Docker image as the one above, on [Render](https://render.com) with a managed PostgreSQL database. It sleeps when nobody is using it, so the first visit after a quiet spell can take up to a minute to wake up. Create your own account to try it; each account is private.
 
 Want to host your own copy? The repo includes a Render blueprint and a step-by-step [deployment guide](docs/DEPLOYMENT.md). It takes about ten minutes and costs nothing.
 
