@@ -15,7 +15,7 @@
   border-bottom: 3px solid var(--color-orange);
   box-shadow: 0 4px 16px rgba(52, 80, 63, 0.25);
 }
-.brand { grid-area: brand; }
+.brand { grid-area: brand; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .shopName { font-size: var(--text-sm); opacity: 0.8; margin-left: var(--space-2); }
 .nav { grid-area: nav; display: flex; gap: var(--space-1); overflow-x: auto; }
 .link {

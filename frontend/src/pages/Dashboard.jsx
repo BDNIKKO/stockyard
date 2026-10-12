@@ -39,7 +39,7 @@ export default function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e6d6cd" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="name" interval={0} tick={{ fontSize: 12 }} tickFormatter={(n) => (n.length > 11 ? `${n.slice(0, 10)}…` : n)} />
                 <YAxis />
                 <Tooltip formatter={(v) => formatMoney(v)} />
                 <Legend />
